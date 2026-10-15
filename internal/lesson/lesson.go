@@ -15,8 +15,9 @@ import (
 type Kind string
 
 const (
-	KindGo  Kind = "go"
-	KindSQL Kind = "sql"
+	KindGo    Kind = "go"
+	KindSQL   Kind = "sql"
+	KindShell Kind = "shell" // terminal task, checked by a bash script
 )
 
 // Lesson is a single exercise.
@@ -38,9 +39,14 @@ type Lesson struct {
 	// is used by the content tests to prove the lesson is solvable.
 	Solution string `yaml:"solution"`
 
-	// SQL lessons.
-	Setup   string `yaml:"setup"`   // overrides the track setup when set
-	Ordered bool   `yaml:"ordered"` // row order matters
+	// SQL lessons: schema and data (overrides the track setup when set).
+	// Shell lessons: bash script that prepares the lesson workspace.
+	Setup   string `yaml:"setup"`
+	Ordered bool   `yaml:"ordered"` // SQL: row order matters
+
+	// Shell lessons: bash script run in the workspace; exit code 0 means solved.
+	// Whatever it prints is shown to the user when the check fails.
+	Check string `yaml:"check"`
 
 	Track *Track `yaml:"-"`
 }
@@ -156,6 +162,10 @@ func validate(l *Lesson) error {
 		}
 		if strings.TrimSpace(l.SQLSetup()) == "" {
 			return fmt.Errorf("sql lesson needs setup (in lesson or track)")
+		}
+	case KindShell:
+		if l.Check == "" {
+			return fmt.Errorf("shell lesson needs check")
 		}
 	default:
 		return fmt.Errorf("unknown type %q", l.Kind)

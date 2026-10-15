@@ -1,0 +1,35 @@
+title: Права доступа
+type: shell
+xp: 20
+theory: |
+  У каждого файла есть права для **владельца**, **группы** и **остальных**: чтение `r`, запись `w`, выполнение `x`. Посмотреть их можно через `ls -l`:
+
+  ```
+  -rw-r--r--  1 anna staff  120 deploy.sh
+  ```
+
+  Изменить права можно через `chmod`:
+
+  ```bash
+  chmod +x deploy.sh   # разрешить запуск
+  chmod 644 file.txt   # rw-r--r-- (цифрами: r=4, w=2, x=1)
+  ./deploy.sh          # запустить скрипт из текущей папки
+  ```
+task: |
+  В папке лежит скрипт `deploy.sh`, но запустить его нельзя. Сделай его исполняемым и запусти через `./deploy.sh`. Скрипт создаст файл `deployed.txt`.
+hint: |
+  `chmod +x deploy.sh`, затем `./deploy.sh`.
+setup: |
+  cat > deploy.sh <<'SH'
+  #!/usr/bin/env bash
+  echo "Deploying GoLearn..."
+  date > deployed.txt
+  echo "Done!"
+  SH
+  chmod 644 deploy.sh
+check: |
+  if [ ! -x deploy.sh ]; then echo "deploy.sh всё ещё не исполняемый (проверь ls -l)."; exit 1; fi
+  if [ ! -f deployed.txt ]; then echo "Права исправлены, но скрипт ещё не запущен: нет deployed.txt."; exit 1; fi
+  echo "Деплой выполнен."
+solution: |
+  chmod +x deploy.sh && ./deploy.sh

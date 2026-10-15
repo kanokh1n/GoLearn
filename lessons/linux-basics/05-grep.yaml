@@ -1,0 +1,40 @@
+title: Поиск в тексте (grep)
+type: shell
+xp: 15
+theory: |
+  `grep` ищет строки по шаблону:
+
+  ```bash
+  grep "ERROR" app.log           # строки, где есть ERROR
+  grep -i "error" app.log        # без учёта регистра
+  grep -c "ERROR" app.log        # только количество строк
+  grep -v "DEBUG" app.log        # все строки, КРОМЕ DEBUG
+  grep -r "TODO" .               # искать во всех файлах рекурсивно
+  ```
+
+  Результат можно сохранить в файл: `grep "ERROR" app.log > errors.txt`.
+task: |
+  В файле `app.log` логи сервиса. Сохрани в файл `errors.txt` все строки, в которых есть `ERROR` (заглавными буквами), в том же порядке.
+hint: |
+  `grep "ERROR" app.log > errors.txt`
+setup: |
+  cat > app.log <<'LOG'
+  2026-10-15 10:00:01 INFO  server started on :8080
+  2026-10-15 10:00:05 DEBUG connected to postgres
+  2026-10-15 10:01:12 ERROR failed to parse request body
+  2026-10-15 10:01:13 INFO  GET /api/users 200
+  2026-10-15 10:02:40 WARN  slow query: 1.2s
+  2026-10-15 10:03:02 ERROR database timeout
+  2026-10-15 10:03:03 INFO  GET /api/orders 500
+  2026-10-15 10:05:00 DEBUG cache hit ratio 0.93
+  2026-10-15 10:06:21 ERROR panic recovered: nil pointer
+  2026-10-15 10:07:00 INFO  shutdown requested
+  LOG
+check: |
+  if [ ! -f errors.txt ]; then echo "Файл errors.txt не найден."; exit 1; fi
+  if ! grep "ERROR" app.log | diff -q - errors.txt >/dev/null; then
+    echo "В errors.txt должны быть ровно строки с ERROR. Сейчас там:"; cat errors.txt; exit 1
+  fi
+  echo "Найдено ошибок: $(wc -l < errors.txt | tr -d ' ')"
+solution: |
+  grep "ERROR" app.log > errors.txt

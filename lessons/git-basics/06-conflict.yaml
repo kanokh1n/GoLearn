@@ -1,0 +1,51 @@
+title: Конфликт слияния
+type: shell
+xp: 30
+theory: |
+  Если одну и ту же строку изменили в обеих ветках, Git не знает, какой вариант правильный, и сообщает о **конфликте**. В файле появляются маркеры:
+
+  ```
+  <<<<<<< HEAD
+  вариант из текущей ветки
+  =======
+  вариант из сливаемой ветки
+  >>>>>>> feature
+  ```
+
+  Как разрешить конфликт:
+
+  1. Открыть файл (например, `nano greeting.txt`) и оставить нужный текст, удалив маркеры.
+  2. `git add greeting.txt`
+  3. `git commit` (сообщение подставится автоматически)
+
+  Передумал? `git merge --abort` вернёт всё как было до слияния.
+task: |
+  Слей ветку `feature/greeting` в `main`. Возникнет конфликт в `greeting.txt`. Разреши его так, чтобы в файле осталась **ровно одна строка**:
+
+  ```
+  Hello from both branches!
+  ```
+
+  и заверши слияние коммитом.
+hint: |
+  `git merge feature/greeting`, затем `echo "Hello from both branches!" > greeting.txt`, `git add greeting.txt`, `git commit --no-edit`.
+setup: |
+  git init -q
+  echo "Hello" > greeting.txt
+  git add . && git commit -qm "Add greeting"
+  git switch -qc feature/greeting
+  echo "Hello from feature!" > greeting.txt
+  git commit -qam "Feature greeting"
+  git switch -q main
+  echo "Hello from main!" > greeting.txt
+  git commit -qam "Main greeting"
+check: |
+  if [ -f .git/MERGE_HEAD ]; then echo "Слияние ещё не завершено: разреши конфликт, сделай git add и git commit."; exit 1; fi
+  if ! git merge-base --is-ancestor feature/greeting main; then echo "Ветка feature/greeting ещё не влита в main."; exit 1; fi
+  if grep -qE '^(<<<<<<<|=======|>>>>>>>)' greeting.txt; then echo "В greeting.txt остались маркеры конфликта."; exit 1; fi
+  if [ "$(git show HEAD:greeting.txt)" != "Hello from both branches!" ]; then echo "В закоммиченном greeting.txt должна быть одна строка «Hello from both branches!». Сейчас:"; git show HEAD:greeting.txt; exit 1; fi
+  echo "Конфликт разрешён!"
+solution: |
+  git merge -q feature/greeting || true
+  echo "Hello from both branches!" > greeting.txt
+  git add greeting.txt && git commit -q --no-edit

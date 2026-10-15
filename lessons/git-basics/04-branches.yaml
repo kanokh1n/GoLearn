@@ -1,0 +1,33 @@
+title: Ветки
+type: shell
+xp: 20
+theory: |
+  **Ветка** — отдельная линия разработки. В ней можно спокойно делать фичу, не ломая основную ветку `main`.
+
+  ```bash
+  git branch                    # список веток (* — текущая)
+  git switch -c feature/login   # создать ветку и перейти в неё
+  git switch main               # вернуться в main
+  git log --oneline --all --graph  # история всех веток
+  ```
+task: |
+  1. Создай ветку `feature/login` и перейди в неё.
+  2. Создай файл `login.go` (содержимое любое) и закоммить его.
+  3. Вернись в ветку `main`.
+
+  В `main` файла `login.go` быть не должно.
+hint: |
+  `git switch -c feature/login`, `touch login.go`, `git add login.go`, `git commit -m "Add login"`, `git switch main`.
+setup: |
+  git init -q
+  echo "# Shop" > README.md
+  git add . && git commit -qm "Initial commit"
+check: |
+  if ! git rev-parse -q --verify feature/login >/dev/null; then echo "Ветка feature/login не найдена."; exit 1; fi
+  if ! git ls-tree -r --name-only feature/login | grep -qx login.go; then echo "В ветке feature/login нет закоммиченного login.go."; exit 1; fi
+  cur=$(git branch --show-current)
+  if [ "$cur" != "main" ]; then echo "Сейчас ты в ветке «$cur». Вернись в main: git switch main"; exit 1; fi
+  if git ls-tree -r --name-only main | grep -qx login.go; then echo "login.go попал в main, а должен быть только в feature/login."; exit 1; fi
+  echo "Ветка готова, ты снова в main."
+solution: |
+  git switch -qc feature/login && echo 'package main' > login.go && git add login.go && git commit -qm "Add login" && git switch -q main

@@ -47,19 +47,27 @@ func (s *Server) lessonPage(w http.ResponseWriter, r *http.Request) {
 		code = d
 	}
 	var tables []runner.Table
-	if l.Kind == lesson.KindSQL {
+	var workspace string
+	switch l.Kind {
+	case lesson.KindSQL:
 		var err error
 		if tables, err = runner.Tables(r.Context(), l.SQLSetup()); err != nil {
 			s.log.Error("load tables", "lesson", l.Key(), "err", err)
 		}
+	case lesson.KindShell:
+		var err error
+		if workspace, err = s.workspace(r.Context(), l); err != nil {
+			s.log.Error("prepare workspace", "lesson", l.Key(), "err", err)
+		}
 	}
 	s.render(w, "lesson.html", map[string]any{
-		"Title":  l.Title,
-		"Lesson": l,
-		"Code":   code,
-		"Tables": tables,
-		"Next":   l.Track.Next(l),
-		"XP":     s.progress.TotalXP(),
+		"Title":     l.Title,
+		"Lesson":    l,
+		"Code":      code,
+		"Tables":    tables,
+		"Workspace": workspace,
+		"Next":      l.Track.Next(l),
+		"XP":        s.progress.TotalXP(),
 	})
 }
 
@@ -110,6 +118,8 @@ func (s *Server) check(w http.ResponseWriter, r *http.Request, l *lesson.Lesson,
 		res, err = checkGo(r, l, code)
 	case lesson.KindSQL:
 		res, err = checkSQL(r, l, code)
+	case lesson.KindShell:
+		res, err = s.checkShell(r, l)
 	}
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
@@ -172,7 +182,30 @@ func checkSQL(r *http.Request, l *lesson.Lesson, code string) (checkResult, erro
 	return checkResult{OK: true, Message: "Верно!", Table: &got}, nil
 }
 
+func (s *Server) checkShell(r *http.Request, l *lesson.Lesson) (checkResult, error) {
+	dir, err := s.workspace(r.Context(), l)
+	if err != nil {
+		return checkResult{}, err
+	}
+	out, ok, err := runner.CheckShell(r.Context(), dir, l.Check)
+	if err != nil {
+		return checkResult{}, err
+	}
+	if ok {
+		return checkResult{OK: true, Message: "Верно!", Output: out}, nil
+	}
+	return checkResult{Message: "Пока не получилось. Посмотри, что не так, ниже.", Output: out}, nil
+}
+
 func (s *Server) reset(w http.ResponseWriter, r *http.Request, l *lesson.Lesson, _ string) {
+	if l.Kind == lesson.KindShell {
+		if err := runner.PrepareWorkspace(r.Context(), s.workspaceDir(l), l.Setup); err != nil {
+			writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]string{})
+		return
+	}
 	if err := s.progress.ClearDraft(l.Key()); err != nil {
 		s.log.Error("clear draft", "lesson", l.Key(), "err", err)
 	}

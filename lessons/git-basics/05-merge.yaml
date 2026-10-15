@@ -1,0 +1,32 @@
+title: Слияние веток
+type: shell
+xp: 20
+theory: |
+  Когда фича готова, её ветку **сливают** (merge) в `main`:
+
+  ```bash
+  git switch main          # перейти в ветку, КУДА сливаем
+  git merge feature/cart   # влить в неё изменения из feature/cart
+  ```
+
+  Если в `main` не было новых коммитов, Git просто передвинет `main` вперёд (fast-forward). Иначе создаст merge-коммит.
+task: |
+  В репозитории есть ветка `feature/cart` с готовой корзиной. Слей её в `main`.
+hint: |
+  Убедись, что ты в `main` (`git branch`), и выполни `git merge feature/cart`.
+setup: |
+  git init -q
+  echo "# Shop" > README.md
+  git add . && git commit -qm "Initial commit"
+  git switch -qc feature/cart
+  printf 'package main\n\nfunc AddToCart() {}\n' > cart.go
+  git add . && git commit -qm "Add cart"
+  printf '\nfunc RemoveFromCart() {}\n' >> cart.go
+  git commit -qam "Add remove from cart"
+  git switch -q main
+check: |
+  if ! git merge-base --is-ancestor feature/cart main; then echo "Изменения из feature/cart ещё не в main."; exit 1; fi
+  if [ "$(git branch --show-current)" != "main" ]; then echo "Слияние есть, но вернись в ветку main."; exit 1; fi
+  echo "feature/cart влита в main."
+solution: |
+  git merge -q feature/cart

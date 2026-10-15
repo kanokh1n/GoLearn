@@ -7,7 +7,9 @@ import (
 	"html/template"
 	"io/fs"
 	"log/slog"
+	"net"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -26,16 +28,23 @@ type Server struct {
 	log      *slog.Logger
 	pages    map[string]*template.Template
 	md       goldmark.Markdown
+
+	workspaceRoot string // shell lessons get a folder here: <root>/<track>/<lesson>
 }
 
 // New parses templates and builds a Server.
-func New(c *lesson.Catalog, p *progress.Store, log *slog.Logger) (*Server, error) {
+func New(c *lesson.Catalog, p *progress.Store, workspaceRoot string, log *slog.Logger) (*Server, error) {
+	root, err := filepath.Abs(workspaceRoot)
+	if err != nil {
+		return nil, err
+	}
 	s := &Server{
-		catalog:  c,
-		progress: p,
-		log:      log,
-		pages:    map[string]*template.Template{},
-		md:       goldmark.New(goldmark.WithExtensions(extension.GFM)),
+		catalog:       c,
+		progress:      p,
+		log:           log,
+		pages:         map[string]*template.Template{},
+		md:            goldmark.New(goldmark.WithExtensions(extension.GFM)),
+		workspaceRoot: root,
 	}
 	funcs := template.FuncMap{"markdown": s.markdown, "done": p.Done}
 	for _, page := range []string{"index.html", "lesson.html"} {
@@ -58,7 +67,40 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/lesson/{track}/{lesson}/run", s.withLesson(s.run))
 	mux.HandleFunc("POST /api/lesson/{track}/{lesson}/check", s.withLesson(s.check))
 	mux.HandleFunc("POST /api/lesson/{track}/{lesson}/reset", s.withLesson(s.reset))
-	return s.logRequests(mux)
+	mux.HandleFunc("GET /api/lesson/{track}/{lesson}/terminal", s.terminal)
+	return s.logRequests(localOnly(mux))
+}
+
+// localOnly blocks requests that come from other websites. GoLearn runs code
+// and opens shells on this machine, so a page on the internet must not be able
+// to call its API from the user's browser (CSRF) or reach it via DNS rebinding.
+func localOnly(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		host, _, err := net.SplitHostPort(r.Host)
+		if err != nil {
+			host = r.Host
+		}
+		if host != "127.0.0.1" && host != "localhost" && host != "::1" {
+			http.Error(w, "GoLearn accepts only localhost requests", http.StatusForbidden)
+			return
+		}
+		if site := r.Header.Get("Sec-Fetch-Site"); site == "cross-site" || site == "same-site" {
+			http.Error(w, "cross-site request blocked", http.StatusForbidden)
+			return
+		}
+		if r.Method == http.MethodPost {
+			if origin := r.Header.Get("Origin"); origin != "" && origin != "http://"+r.Host {
+				http.Error(w, "cross-origin request blocked", http.StatusForbidden)
+				return
+			}
+			// Forms can't send application/json, so this also stops form-based CSRF.
+			if !strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") {
+				http.Error(w, "expected application/json", http.StatusUnsupportedMediaType)
+				return
+			}
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 func (s *Server) logRequests(next http.Handler) http.Handler {

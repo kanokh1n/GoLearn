@@ -1,0 +1,37 @@
+title: .gitignore
+type: shell
+xp: 20
+theory: |
+  Не всё нужно хранить в репозитории: логи, собранные бинарники, секреты (`.env`). Их перечисляют в файле **`.gitignore`**:
+
+  ```
+  *.log      # все файлы с расширением .log
+  bin/       # папка bin целиком
+  .env       # конкретный файл
+  ```
+
+  Git перестаёт показывать такие файлы в `git status` и не даст случайно добавить их через `git add .`.
+task: |
+  В репозитории лежат `main.go`, логи `app.log` и `error.log`, папка `bin/` с бинарником и файл `.env` с паролем.
+
+  Создай `.gitignore`, чтобы игнорировались **все `.log` файлы, папка `bin/` и `.env`**, а затем закоммить `.gitignore` и `main.go` (через `git add .` можно, если `.gitignore` уже правильный).
+hint: |
+  `printf '*.log\nbin/\n.env\n' > .gitignore`, проверь `git status`, потом `git add .` и `git commit -m "Add gitignore"`.
+setup: |
+  git init -q
+  printf 'package main\n\nfunc main() {}\n' > main.go
+  echo "started" > app.log
+  echo "oops" > error.log
+  mkdir bin && echo "binary" > bin/app
+  echo "DB_PASSWORD=supersecret" > .env
+check: |
+  if [ ! -f .gitignore ]; then echo "Файл .gitignore не найден."; exit 1; fi
+  for f in app.log error.log bin/app .env; do
+    git check-ignore -q "$f" || { echo "$f не игнорируется. Проверь правила в .gitignore."; exit 1; }
+  done
+  tracked=$(git ls-files 2>/dev/null | sort | tr '\n' ' ')
+  if [ "$tracked" != ".gitignore main.go " ]; then echo "В репозитории должны быть только .gitignore и main.go. Сейчас: $tracked"; exit 1; fi
+  if git status --porcelain | grep -q .; then echo "Есть незакоммиченные изменения, сделай коммит."; git status --short; exit 1; fi
+  echo "Секреты и мусор не попадут в репозиторий."
+solution: |
+  printf '*.log\nbin/\n.env\n' > .gitignore && git add . && git commit -qm "Add gitignore"

@@ -1,0 +1,32 @@
+title: Первый коммит
+type: shell
+xp: 15
+theory: |
+  **Коммит** — снимок проекта в истории. Делается в два шага:
+
+  ```bash
+  git add README.md            # 1. добавить файл в индекс (staging area)
+  git add .                    #    или все изменения сразу
+  git commit -m "Message"      # 2. сохранить снимок с сообщением
+  git log --oneline            # посмотреть историю
+  ```
+
+  Индекс — это «черновик» следующего коммита: в коммит попадёт только то, что ты добавил через `git add`.
+task: |
+  Рабочая папка уже репозиторий, в ней есть `README.md` и `main.go`. Сделай коммит с **обоими файлами** и сообщением `Initial commit`.
+hint: |
+  `git add README.md main.go` (или `git add .`), затем `git commit -m "Initial commit"`.
+setup: |
+  git init -q
+  echo "# GoLearn" > README.md
+  printf 'package main\n\nfunc main() {}\n' > main.go
+check: |
+  if ! git rev-parse -q --verify HEAD >/dev/null; then echo "Коммитов пока нет. Посмотри git status."; exit 1; fi
+  msg=$(git log -1 --format=%s)
+  if [ "$msg" != "Initial commit" ]; then echo "Сообщение коммита «$msg», а нужно «Initial commit»."; exit 1; fi
+  for f in README.md main.go; do
+    git ls-files --error-unmatch "$f" >/dev/null 2>&1 || { echo "Файл $f не попал в коммит."; exit 1; }
+  done
+  echo "Первый коммит готов: $(git log --oneline -1)"
+solution: |
+  git add README.md main.go && git commit -qm "Initial commit"

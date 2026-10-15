@@ -1,0 +1,39 @@
+title: Копирование, перемещение, удаление
+type: shell
+xp: 15
+theory: |
+  ```bash
+  cp a.txt b.txt          # копировать файл
+  cp -r dir1 dir2         # копировать папку целиком
+  mv old.txt new.txt      # переименовать
+  mv file.txt dir/        # переместить в папку
+  rm file.txt             # удалить файл
+  rm -r dir               # удалить папку
+  ```
+
+  ⚠️ В терминале нет корзины: `rm` удаляет файлы навсегда.
+task: |
+  В рабочей папке уже лежат файлы (посмотри через `ls -R`). Нужно:
+
+  1. Переименовать `draft.txt` в `final.txt`.
+  2. Скопировать `data/report.txt` в новую папку `backup/` (должен получиться `backup/report.txt`, оригинал остаётся на месте).
+  3. Удалить `old.log`.
+hint: |
+  `mv draft.txt final.txt`, `mkdir backup && cp data/report.txt backup/`, `rm old.log`.
+setup: |
+  mkdir -p data
+  echo "my draft" > draft.txt
+  echo "Q3 report: revenue +15%" > data/report.txt
+  echo "debug noise" > old.log
+check: |
+  ok=0
+  [ -f final.txt ] && grep -q "my draft" final.txt || { echo "Нет файла final.txt с содержимым из draft.txt."; ok=1; }
+  [ ! -e draft.txt ] || { echo "draft.txt всё ещё существует, его нужно переименовать, а не скопировать."; ok=1; }
+  [ -f backup/report.txt ] || { echo "Нет файла backup/report.txt."; ok=1; }
+  [ -f data/report.txt ] || { echo "Оригинал data/report.txt пропал, его нужно было скопировать."; ok=1; }
+  [ ! -e old.log ] || { echo "old.log ещё не удалён."; ok=1; }
+  exit $ok
+solution: |
+  mv draft.txt final.txt
+  mkdir backup && cp data/report.txt backup/
+  rm old.log

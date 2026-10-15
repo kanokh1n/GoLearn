@@ -21,16 +21,17 @@ func main() {
 	addr := flag.String("addr", "127.0.0.1:7070", "listen address (keep it on localhost: lessons run code on this machine)")
 	lessonsDir := flag.String("lessons", "lessons", "directory with tracks and lessons")
 	progressFile := flag.String("progress", "data/progress.json", "where to store your progress")
+	workspaces := flag.String("workspaces", "data/workspaces", "where terminal lessons keep their files")
 	flag.Parse()
 
 	log := slog.New(slog.NewTextHandler(os.Stderr, nil))
-	if err := run(*addr, *lessonsDir, *progressFile, log); err != nil {
+	if err := run(*addr, *lessonsDir, *progressFile, *workspaces, log); err != nil {
 		log.Error("fatal", "err", err)
 		os.Exit(1)
 	}
 }
 
-func run(addr, lessonsDir, progressFile string, log *slog.Logger) error {
+func run(addr, lessonsDir, progressFile, workspaces string, log *slog.Logger) error {
 	catalog, err := lesson.Load(lessonsDir)
 	if err != nil {
 		return err
@@ -39,7 +40,7 @@ func run(addr, lessonsDir, progressFile string, log *slog.Logger) error {
 	if err != nil {
 		return err
 	}
-	srv, err := server.New(catalog, store, log)
+	srv, err := server.New(catalog, store, workspaces, log)
 	if err != nil {
 		return err
 	}

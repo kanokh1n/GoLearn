@@ -1,0 +1,26 @@
+title: Поиск файлов
+type: shell
+xp: 15
+theory: |
+  `find` ищет файлы по имени, типу, размеру и другим признакам:
+
+  ```bash
+  find . -name "*.go"            # все .go файлы в текущей папке и глубже
+  find . -type d -name "test*"   # папки, имя которых начинается на test
+  find /var/log -size +10M       # файлы больше 10 МБ
+  ```
+
+  `.` означает текущую папку.
+task: |
+  Где-то глубоко в папке `archive` спрятан файл `key.txt`. Найди его и скопируй в рабочую папку (чтобы рядом с `archive` лежал `key.txt`).
+hint: |
+  `find archive -name key.txt` покажет путь. Потом `cp <путь> .` (точка — текущая папка).
+setup: |
+  for y in 2021 2022 2023 2024; do for m in 01 02 03 04 05 06; do mkdir -p archive/$y/$m; echo "log $y-$m" > archive/$y/$m/log.txt; done; done
+  echo "golearn-secret-42" > archive/2023/04/key.txt
+check: |
+  if [ ! -f key.txt ]; then echo "В рабочей папке нет key.txt."; exit 1; fi
+  if ! grep -q "golearn-secret-42" key.txt; then echo "key.txt есть, но это не тот файл."; exit 1; fi
+  echo "Ключ найден!"
+solution: |
+  cp "$(find archive -name key.txt)" .

@@ -1,0 +1,32 @@
+title: Запись и чтение файлов
+type: shell
+xp: 10
+theory: |
+  `echo` выводит текст, а `>` перенаправляет вывод в файл:
+
+  ```bash
+  echo "first line" > notes.txt    # создать или перезаписать
+  echo "second line" >> notes.txt  # дописать в конец
+  cat notes.txt                    # показать содержимое
+  ```
+
+  Для длинных файлов удобнее `less` (выход — `q`), а также `head -n 5` и `tail -n 5`.
+task: |
+  Создай файл `hello.txt` с двумя строками:
+
+  ```
+  Hello, Linux!
+  I am learning the terminal.
+  ```
+hint: |
+  `echo "Hello, Linux!" > hello.txt`, затем `echo "I am learning the terminal." >> hello.txt`. Проверь через `cat hello.txt`.
+check: |
+  if [ ! -f hello.txt ]; then echo "Файл hello.txt не найден."; exit 1; fi
+  printf 'Hello, Linux!\nI am learning the terminal.\n' > /tmp/golearn-expected.$$
+  if ! diff -q /tmp/golearn-expected.$$ hello.txt >/dev/null; then
+    echo "Содержимое hello.txt не совпадает. Сейчас в файле:"; cat hello.txt; rm -f /tmp/golearn-expected.$$; exit 1
+  fi
+  rm -f /tmp/golearn-expected.$$
+solution: |
+  echo "Hello, Linux!" > hello.txt
+  echo "I am learning the terminal." >> hello.txt

@@ -1,0 +1,37 @@
+title: Отмена коммита
+type: shell
+xp: 25
+theory: |
+  Ошибки в истории исправляют по-разному:
+
+  | Команда | Что делает | Когда использовать |
+  |---------|------------|--------------------|
+  | `git restore file` | откатывает незакоммиченные изменения файла | ещё не коммитил |
+  | `git revert <коммит>` | создаёт **новый** коммит, отменяющий старый | коммит уже отправлен коллегам |
+  | `git reset --hard HEAD~1` | **удаляет** последний коммит из истории | только локально, никому не отправлял |
+
+  В общих ветках (`main`) историю не переписывают, поэтому там используют `revert`.
+
+  ```bash
+  git log --oneline     # найти коммит
+  git revert HEAD       # отменить последний коммит
+  ```
+task: |
+  Последний коммит `Remove config` по ошибке удалил важный файл `config.yaml`. Отмени этот коммит через **`git revert`**, не переписывая историю (старые коммиты должны остаться).
+hint: |
+  `git revert HEAD --no-edit`. После этого `config.yaml` вернётся, а в `git log` появится новый коммит `Revert "Remove config"`.
+setup: |
+  git init -q
+  printf 'port: 7070\ndb: postgres://localhost/shop\n' > config.yaml
+  printf 'package main\n\nfunc main() {}\n' > main.go
+  git add . && git commit -qm "Initial commit"
+  echo "# Shop" > README.md && git add . && git commit -qm "Add readme"
+  git rm -q config.yaml && git commit -qm "Remove config"
+check: |
+  if [ "$(git rev-list --count HEAD)" -lt 4 ]; then echo "Коммитов стало меньше, чем было. Похоже, история переписана (reset). Нажми «Начать заново» и используй git revert."; exit 1; fi
+  if ! git log --format=%s | grep -qx "Remove config"; then echo "Коммит «Remove config» пропал из истории, а должен остаться."; exit 1; fi
+  if ! git ls-files --error-unmatch config.yaml >/dev/null 2>&1; then echo "config.yaml всё ещё удалён в последнем коммите."; exit 1; fi
+  if ! git log -1 --format=%s | grep -q '^Revert'; then echo "Последний коммит должен быть revert-коммитом."; exit 1; fi
+  echo "config.yaml восстановлен, история не тронута."
+solution: |
+  git revert --no-edit HEAD >/dev/null

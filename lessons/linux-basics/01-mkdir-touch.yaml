@@ -1,0 +1,27 @@
+title: Папки и файлы
+type: shell
+xp: 10
+theory: |
+  Терминал — главный инструмент backend-разработчика. Справа настоящий терминал (bash), открытый в рабочей папке урока.
+
+  Основные команды:
+
+  | Команда | Что делает |
+  |---------|------------|
+  | `pwd` | показывает текущую папку |
+  | `ls` | список файлов (`ls -la` — подробно, со скрытыми) |
+  | `cd папка` | перейти в папку (`cd ..` — на уровень выше) |
+  | `mkdir папка` | создать папку (`mkdir -p a/b/c` — сразу вложенные) |
+  | `touch файл` | создать пустой файл |
+task: |
+  В рабочей папке создай папку `projects`, а в ней пустой файл `README.md`.
+
+  Когда закончишь, нажми **Проверить**.
+hint: |
+  `mkdir projects`, затем `touch projects/README.md`.
+check: |
+  if [ ! -d projects ]; then echo "Папка projects не найдена в рабочей папке."; exit 1; fi
+  if [ ! -f projects/README.md ]; then echo "Файл projects/README.md не найден."; exit 1; fi
+  echo "Папка и файл на месте."
+solution: |
+  mkdir projects && touch projects/README.md

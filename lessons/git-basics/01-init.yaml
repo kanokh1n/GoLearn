@@ -1,0 +1,26 @@
+title: Новый репозиторий
+type: shell
+xp: 10
+theory: |
+  **Git** хранит историю изменений проекта. Папка с историей называется **репозиторием**, а сама история лежит в скрытой папке `.git`.
+
+  ```bash
+  git init        # превратить текущую папку в репозиторий
+  git status      # что изменилось и что готово к коммиту
+  ```
+
+  `git status` — самая частая команда. Запускай её, когда не уверен, что происходит.
+task: |
+  В рабочей папке есть проект `myapp`. Перейди в него и создай там Git-репозиторий.
+hint: |
+  `cd myapp`, затем `git init`. Проверь через `ls -la`: должна появиться папка `.git`.
+setup: |
+  mkdir myapp
+  printf 'package main\n\nfunc main() {}\n' > myapp/main.go
+  echo "# My App" > myapp/README.md
+check: |
+  if [ -d .git ]; then echo "Репозиторий создан в рабочей папке, а нужно внутри myapp. Удали его: rm -rf .git"; exit 1; fi
+  if [ ! -d myapp/.git ]; then echo "В папке myapp нет репозитория (.git)."; exit 1; fi
+  echo "Репозиторий myapp создан."
+solution: |
+  cd myapp && git init -q

@@ -1,5 +1,5 @@
 // Package lessons_test checks the lesson content itself: every lesson loads,
-// its reference solution passes, and its starter code does not.
+// its reference solution passes, and its starter code (or untouched workspace) does not.
 package lessons_test
 
 import (
@@ -34,6 +34,20 @@ func TestLessons(t *testing.T) {
 					}
 					if goPasses(t, ctx, l, l.Starter) {
 						t.Error("starter code already passes")
+					}
+				case lesson.KindShell:
+					dir := t.TempDir()
+					if err := runner.PrepareWorkspace(ctx, dir, l.Setup); err != nil {
+						t.Fatal(err)
+					}
+					if _, ok, err := runner.CheckShell(ctx, dir, l.Check); err != nil || ok {
+						t.Fatalf("check passes before solving (err=%v)", err)
+					}
+					if out, ok, err := runner.RunScript(ctx, dir, l.Solution); err != nil || !ok {
+						t.Fatalf("solution script failed: %v\n%s", err, out)
+					}
+					if out, ok, err := runner.CheckShell(ctx, dir, l.Check); err != nil || !ok {
+						t.Errorf("check fails after solution: %v\n%s", err, out)
 					}
 				case lesson.KindSQL:
 					if _, ok, msg, err := runner.CheckSQL(ctx, l.SQLSetup(), l.Solution, l.Solution, l.Ordered); err != nil || !ok {

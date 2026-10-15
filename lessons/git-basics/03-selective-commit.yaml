@@ -1,0 +1,31 @@
+title: Коммит только нужного
+type: shell
+xp: 15
+theory: |
+  Хорошая практика: **один коммит — одно логическое изменение**. Поэтому в коммит часто добавляют не всё подряд.
+
+  ```bash
+  git status          # что изменено и что не отслеживается (untracked)
+  git diff            # что именно поменялось в файлах
+  git add main.go     # добавить только один файл
+  git restore --staged file  # убрать файл из индекса, если добавил лишнее
+  ```
+task: |
+  В репозитории изменён `main.go` и появился новый файл `debug.go`. Сделай коммит, в который попадёт **только** `main.go`, с сообщением `Fix greeting`. `debug.go` коммитить нельзя, он должен остаться неотслеживаемым.
+hint: |
+  `git add main.go`, затем `git commit -m "Fix greeting"`. Проверь `git status`: `debug.go` должен остаться в Untracked files.
+setup: |
+  git init -q
+  printf 'package main\n\nimport "fmt"\n\nfunc main() {\n\tfmt.Println("Helo")\n}\n' > main.go
+  git add main.go && git commit -qm "Add main"
+  sed -i.bak 's/Helo/Hello/' main.go && rm -f main.go.bak
+  printf 'package main\n\n// temporary debugging helpers\n' > debug.go
+check: |
+  msg=$(git log -1 --format=%s)
+  if [ "$msg" != "Fix greeting" ]; then echo "Последний коммит «$msg», а нужен «Fix greeting»."; exit 1; fi
+  if git ls-files --error-unmatch debug.go >/dev/null 2>&1; then echo "debug.go попал в репозиторий, а не должен. Подсказка: git reset HEAD~1 вернёт всё как было до коммита."; exit 1; fi
+  if ! git show HEAD:main.go | grep -q '"Hello"'; then echo "В коммите нет исправленного main.go."; exit 1; fi
+  if [ ! -f debug.go ]; then echo "debug.go удалён, а должен остаться в папке неотслеживаемым."; exit 1; fi
+  echo "Отлично, в коммите только main.go."
+solution: |
+  git add main.go && git commit -qm "Fix greeting"

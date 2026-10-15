@@ -33,6 +33,15 @@
   </section>
 
   <section class="pane right">
+    {{if eq $l.Kind "shell"}}
+    <div id="terminal" class="terminal"></div>
+    <div class="muted small">Рабочая папка: <code>{{.Workspace}}</code></div>
+    <div class="actions">
+      <button id="check" class="btn primary">✔ Проверить</button>
+      <button id="reset" class="btn ghost">↺ Начать заново</button>
+      {{if .Next}}<a class="btn ghost right-btn" href="/lesson/{{$l.Track.ID}}/{{.Next.ID}}">Пропустить →</a>{{end}}
+    </div>
+    {{else}}
     <textarea id="code">{{.Code}}</textarea>
     <div class="actions">
       <button id="run" class="btn">▶ Запустить <small>Ctrl+Enter</small></button>
@@ -40,14 +49,21 @@
       <button id="reset" class="btn ghost">↺ Сбросить</button>
       {{if .Next}}<a class="btn ghost right-btn" href="/lesson/{{$l.Track.ID}}/{{.Next.ID}}">Пропустить →</a>{{end}}
     </div>
+    {{end}}
     <div id="verdict" class="verdict hidden"></div>
     <div id="output" class="output"><span class="muted">Здесь появится результат.</span></div>
   </section>
 </main>
+{{if eq $l.Kind "shell"}}
+<script src="/static/vendor/xterm/xterm.js"></script>
+<script src="/static/vendor/xterm/addon-fit.js"></script>
+<script src="/static/terminal.js"></script>
+{{else}}
 <script src="/static/vendor/codemirror/codemirror.js"></script>
 <script src="/static/vendor/codemirror/go.js"></script>
 <script src="/static/vendor/codemirror/sql.js"></script>
 <script src="/static/vendor/codemirror/matchbrackets.js"></script>
 <script src="/static/vendor/codemirror/closebrackets.js"></script>
 <script src="/static/lesson.js"></script>
+{{end}}
 {{end}}

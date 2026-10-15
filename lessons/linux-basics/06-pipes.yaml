@@ -1,0 +1,35 @@
+title: Пайпы
+type: shell
+xp: 20
+theory: |
+  **Пайп** `|` передаёт вывод одной команды на вход другой. Из маленьких команд собирают мощные цепочки:
+
+  ```bash
+  cat access.log | wc -l                  # сколько строк
+  cut -d' ' -f1 access.log                # первый столбец (разделитель пробел)
+  sort file | uniq                        # уникальные строки (uniq работает только после sort)
+  sort file | uniq -c | sort -rn | head -3  # топ-3 самых частых строк
+  ```
+task: |
+  В `access.log` каждая строка начинается с IP-адреса клиента. Запиши в файл `ips.txt` **уникальные** IP-адреса, **отсортированные** командой `sort` (по одному на строку).
+hint: |
+  `cut -d' ' -f1 access.log | sort | uniq > ips.txt`
+setup: |
+  cat > access.log <<'LOG'
+  10.0.0.5 GET /api/users 200
+  192.168.1.10 GET /api/orders 200
+  10.0.0.5 POST /api/login 401
+  172.16.0.3 GET /health 200
+  10.0.0.5 POST /api/login 200
+  192.168.1.10 GET /api/orders/7 404
+  8.8.8.8 GET / 200
+  172.16.0.3 GET /health 200
+  LOG
+check: |
+  if [ ! -f ips.txt ]; then echo "Файл ips.txt не найден."; exit 1; fi
+  if ! cut -d' ' -f1 access.log | sort -u | diff -q - ips.txt >/dev/null; then
+    echo "Ожидались уникальные отсортированные IP. Сейчас в ips.txt:"; cat ips.txt; exit 1
+  fi
+  echo "Уникальных клиентов: $(wc -l < ips.txt | tr -d ' ')"
+solution: |
+  cut -d' ' -f1 access.log | sort | uniq > ips.txt

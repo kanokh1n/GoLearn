@@ -1,0 +1,41 @@
+title: Первый bash-скрипт
+type: shell
+xp: 25
+theory: |
+  Bash-скрипт — это файл с командами. Первая строка (shebang) говорит, чем его запускать:
+
+  ```bash
+  #!/usr/bin/env bash
+  name="GoLearn"
+  echo "Hello from $name"
+
+  count=$(ls | wc -l)     # $(...) подставляет вывод команды
+  echo "Files: $count"
+
+  if [ "$count" -gt 5 ]; then
+    echo "many files"
+  fi
+  ```
+
+  Удобно писать файл через редактор `nano script.sh` (сохранить: `Ctrl+O`, `Enter`, выход: `Ctrl+X`) или через `cat > script.sh`.
+task: |
+  Напиши скрипт `count.sh`, который выводит **только число** — количество файлов в папке `files`.
+
+  Скрипт должен работать и когда файлов станет больше, поэтому число нельзя вписать вручную: проверка добавит в папку ещё один файл и запустит скрипт снова.
+hint: |
+  Внутри скрипта: `ls files | wc -l`. На macOS `wc` добавляет пробелы перед числом, это нормально, проверка их игнорирует.
+setup: |
+  mkdir files
+  for i in 1 2 3 4 5 6 7; do echo "file $i" > files/file$i.txt; done
+check: |
+  if [ ! -f count.sh ]; then echo "Скрипт count.sh не найден."; exit 1; fi
+  got=$(bash count.sh 2>&1 | tr -d '[:space:]')
+  want=$(ls files | wc -l | tr -d '[:space:]')
+  if [ "$got" != "$want" ]; then echo "Скрипт вывел «$got», а файлов в папке $want."; exit 1; fi
+  touch files/extra-check-file.txt
+  got2=$(bash count.sh 2>&1 | tr -d '[:space:]')
+  rm -f files/extra-check-file.txt
+  if [ "$got2" != "$((want + 1))" ]; then echo "Когда добавили ещё один файл, скрипт вывел «$got2» вместо $((want + 1)). Похоже, число вписано вручную."; exit 1; fi
+  echo "Скрипт работает: $want файлов."
+solution: |
+  printf '#!/usr/bin/env bash\nls files | wc -l\n' > count.sh
