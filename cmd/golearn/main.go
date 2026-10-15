@@ -18,7 +18,7 @@ import (
 )
 
 func main() {
-	addr := flag.String("addr", "127.0.0.1:8080", "listen address (keep it on localhost: lessons run code on this machine)")
+	addr := flag.String("addr", "127.0.0.1:7070", "listen address (keep it on localhost: lessons run code on this machine)")
 	lessonsDir := flag.String("lessons", "lessons", "directory with tracks and lessons")
 	progressFile := flag.String("progress", "data/progress.json", "where to store your progress")
 	flag.Parse()

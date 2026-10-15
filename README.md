@@ -21,7 +21,7 @@ cd GoLearn
 make run        # or: go run ./cmd/golearn
 ```
 
-Open http://127.0.0.1:8080.
+Open http://127.0.0.1:7070.
 
 Shortcuts in the editor: `Ctrl+Enter` runs the code, `Ctrl+Shift+Enter` checks it.
 
@@ -82,3 +82,8 @@ Tables come from `setup` in `track.yaml` (or in the lesson itself).
 ## Third-party code
 
 [CodeMirror 5](https://codemirror.net/5/) (MIT) is vendored in `web/static/vendor/codemirror`.
+
+## Troubleshooting
+
+**The page shows something else (for example "Welcome to nginx!")** — another program already uses the port.
+Pick a free one: `go run ./cmd/golearn -addr 127.0.0.1:9090`, then open http://127.0.0.1:9090.
