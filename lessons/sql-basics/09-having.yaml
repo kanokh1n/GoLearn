@@ -1,0 +1,22 @@
+title: HAVING
+type: sql
+xp: 20
+theory: |
+  `WHERE` filters **rows before** grouping. `HAVING` filters **groups after** grouping:
+
+  ```sql
+  SELECT department_id, COUNT(*)
+  FROM employees
+  GROUP BY department_id
+  HAVING COUNT(*) > 2;
+  ```
+
+  Order of a query: `SELECT … FROM … WHERE … GROUP BY … HAVING … ORDER BY … LIMIT …`
+task: |
+  Show `department_id` and the **total salary** (`SUM`) of departments whose total salary is **more than 400000**.
+hint: |
+  `GROUP BY department_id HAVING SUM(salary) > 400000`
+starter: |
+  SELECT department_id, SUM(salary)
+  FROM employees
+solution: SELECT department_id, SUM(salary) FROM employees GROUP BY department_id HAVING SUM(salary) > 400000;

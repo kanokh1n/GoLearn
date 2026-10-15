@@ -1,0 +1,28 @@
+{{define "content"}}
+<main class="home">
+  <h1>Your tracks</h1>
+  {{range .Tracks}}
+  <section class="track">
+    <div class="track-head">
+      <div>
+        <h2>{{.Title}}</h2>
+        <p class="muted">{{.Description}}</p>
+      </div>
+      <div class="track-count">{{.Done}} / {{.Total}}</div>
+    </div>
+    <div class="bar"><div style="width: {{.Percent}}%"></div></div>
+    <ol class="lessons">
+      {{range .Lessons}}
+      <li class="{{if done .Key}}done{{end}}">
+        <a href="/lesson/{{.Track.ID}}/{{.ID}}">
+          <span class="mark">{{if done .Key}}✓{{else}}○{{end}}</span>
+          {{.Title}}
+          <span class="kind">{{.Kind}}</span>
+        </a>
+      </li>
+      {{end}}
+    </ol>
+  </section>
+  {{end}}
+</main>
+{{end}}

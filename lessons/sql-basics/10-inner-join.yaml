@@ -1,0 +1,22 @@
+title: INNER JOIN
+type: sql
+xp: 20
+theory: |
+  Data is often split between tables. `employees.department_id` points to `departments.id`.
+  **JOIN** combines rows from two tables:
+
+  ```sql
+  SELECT e.name, d.name
+  FROM employees e
+  JOIN departments d ON d.id = e.department_id;
+  ```
+
+  `e` and `d` are short **aliases**. `INNER JOIN` (or just `JOIN`) keeps only rows that have a match in **both** tables, so Alex (no department) disappears.
+task: |
+  Show each employee's `name` and the `city` where their department is located.
+hint: |
+  Join `employees` with `departments` on `departments.id = employees.department_id` and select `e.name, d.city`.
+starter: |
+  SELECT
+  FROM employees e
+solution: SELECT e.name, d.city FROM employees e JOIN departments d ON d.id = e.department_id;

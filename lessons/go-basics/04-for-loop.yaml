@@ -1,0 +1,69 @@
+title: For Loops
+type: go
+xp: 10
+theory: |
+  Go has only one loop keyword: **`for`**. It has three forms:
+
+  ```go
+  for i := 0; i < 3; i++ { }   // classic
+  for n < 100 { }              // like "while"
+  for { }                      // infinite, stop with break
+  ```
+
+  `break` leaves the loop, `continue` jumps to the next iteration.
+task: |
+  Print the numbers from 1 to 15, one per line, but:
+
+  - for multiples of 3 print `Fizz`
+  - for multiples of 5 print `Buzz`
+  - for multiples of both print `FizzBuzz`
+
+  This is the famous **FizzBuzz** interview task.
+hint: |
+  Use `%` (remainder): `i%3 == 0` means `i` is divisible by 3. Check `i%15 == 0` first.
+starter: |
+  package main
+
+  import "fmt"
+
+  func main() {
+  	for i := 1; i <= 15; i++ {
+  		// your code here
+  		fmt.Println(i)
+  	}
+  }
+expected_output: |
+  1
+  2
+  Fizz
+  4
+  Buzz
+  Fizz
+  7
+  8
+  Fizz
+  Buzz
+  11
+  Fizz
+  13
+  14
+  FizzBuzz
+solution: |
+  package main
+  
+  import "fmt"
+  
+  func main() {
+  	for i := 1; i <= 15; i++ {
+  		switch {
+  		case i%15 == 0:
+  			fmt.Println("FizzBuzz")
+  		case i%3 == 0:
+  			fmt.Println("Fizz")
+  		case i%5 == 0:
+  			fmt.Println("Buzz")
+  		default:
+  			fmt.Println(i)
+  		}
+  	}
+  }

@@ -1,0 +1,16 @@
+title: DISTINCT
+type: sql
+xp: 10
+theory: |
+  `DISTINCT` removes duplicate rows from the result:
+
+  ```sql
+  SELECT DISTINCT hire_year FROM employees;
+  ```
+task: |
+  Get the list of **unique cities** where departments are located.
+hint: |
+  `SELECT DISTINCT city FROM departments;`
+starter: |
+  SELECT
+solution: SELECT DISTINCT city FROM departments;

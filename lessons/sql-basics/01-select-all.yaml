@@ -1,0 +1,20 @@
+title: SELECT *
+type: sql
+xp: 10
+theory: |
+  **SQL** is the language for talking to relational databases. Data lives in **tables** made of rows and columns.
+
+  The simplest query reads everything from a table:
+
+  ```sql
+  SELECT * FROM departments;
+  ```
+
+  `*` means "all columns". Look at the tables on this page: this is the data your queries run against.
+task: |
+  Select **all columns** of **all employees**.
+hint: |
+  `SELECT * FROM employees;`
+starter: |
+  -- write your query here
+solution: SELECT * FROM employees;

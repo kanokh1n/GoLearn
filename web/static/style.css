@@ -1,0 +1,100 @@
+:root {
+  --bg: #15161e;
+  --panel: #1e2030;
+  --panel-2: #262a3d;
+  --border: #33384f;
+  --text: #e4e6f0;
+  --muted: #9097b3;
+  --accent: #00add8; /* Go blue */
+  --ok: #3fb950;
+  --fail: #f85149;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, pre { font-family: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace; font-size: 13.5px; }
+:not(pre) > code { background: var(--panel-2); padding: 1px 6px; border-radius: 4px; }
+pre { tab-size: 4; background: var(--panel-2); padding: 12px; border-radius: 6px; overflow-x: auto; margin: 0 0 12px; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.hidden { display: none !important; }
+
+.topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--panel);
+}
+.logo { font-weight: 800; font-size: 20px; color: var(--text); }
+.logo span { color: var(--accent); }
+.logo:hover { text-decoration: none; }
+.xp { font-weight: 600; }
+
+/* Home */
+.home { max-width: 860px; width: 100%; margin: 0 auto; padding: 24px 16px 64px; }
+.track { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 20px; }
+.track-head { display: flex; justify-content: space-between; gap: 16px; }
+.track h2 { margin: 0; }
+.track p { margin: 4px 0 12px; }
+.track-count { color: var(--muted); white-space: nowrap; }
+.bar { height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; margin-bottom: 12px; }
+.bar > div { height: 100%; background: var(--accent); }
+.lessons { list-style: none; padding: 0; margin: 0; }
+.lessons a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; color: var(--text); }
+.lessons a:hover { background: var(--panel-2); text-decoration: none; }
+.lessons .mark { width: 18px; color: var(--muted); }
+.lessons .done .mark { color: var(--ok); }
+.lessons .kind { margin-left: auto; font-size: 12px; color: var(--muted); text-transform: uppercase; }
+
+/* Lesson */
+.lesson { flex: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0; }
+.pane { min-height: 0; overflow: auto; padding: 20px 24px; }
+.left { border-right: 1px solid var(--border); }
+.right { display: flex; flex-direction: column; gap: 12px; }
+.crumbs { font-size: 13px; color: var(--muted); }
+.lesson h1 { margin: 4px 0 16px; }
+.badge { font-size: 13px; background: var(--ok); color: #000; padding: 2px 8px; border-radius: 10px; vertical-align: middle; }
+.task { background: var(--panel); border-left: 3px solid var(--accent); padding: 4px 16px; border-radius: 6px; margin: 16px 0; }
+.task h3 { margin: 10px 0 4px; }
+.hint { margin: 16px 0; background: var(--panel); padding: 8px 16px; border-radius: 6px; }
+.hint summary { cursor: pointer; }
+.db-table h4 { margin: 16px 0 6px; }
+
+.scroll { overflow: auto; max-height: 320px; }
+table { border-collapse: collapse; font-size: 13.5px; }
+th, td { border: 1px solid var(--border); padding: 4px 10px; text-align: left; }
+th { background: var(--panel-2); }
+
+.right .CodeMirror { flex: 1 1 50%; min-height: 240px; border-radius: 8px; font-size: 14px; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.right-btn { margin-left: auto; }
+.btn {
+  background: var(--panel-2); color: var(--text); border: 1px solid var(--border);
+  padding: 8px 14px; border-radius: 6px; cursor: pointer; font: inherit; font-weight: 600;
+}
+.btn small { font-weight: 400; color: var(--muted); margin-left: 4px; }
+.btn:hover { border-color: var(--accent); text-decoration: none; }
+.btn:disabled { opacity: .5; cursor: wait; }
+.btn.primary { background: var(--accent); color: #001; border-color: var(--accent); }
+.btn.primary small { color: #003040; }
+.btn.ghost { background: transparent; }
+
+.verdict { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; font-weight: 600; }
+.verdict.ok { background: rgba(63, 185, 80, .15); border: 1px solid var(--ok); }
+.verdict.fail { background: rgba(248, 81, 73, .12); border: 1px solid var(--fail); }
+.output { flex: 0 1 auto; min-height: 80px; max-height: 40%; overflow: auto; background: var(--panel); border-radius: 8px; padding: 12px; }
+.output pre { margin: 0; background: none; padding: 0; white-space: pre-wrap; }
+.output pre.err { color: var(--fail); }
+
+@media (max-width: 860px) {
+  .lesson { grid-template-columns: 1fr; }
+  .left { border-right: 0; border-bottom: 1px solid var(--border); }
+  .right .CodeMirror { min-height: 300px; }
+}

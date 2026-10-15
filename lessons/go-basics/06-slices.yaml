@@ -1,0 +1,79 @@
+title: Slices
+type: go
+xp: 15
+theory: |
+  A **slice** is a list of values that can grow:
+
+  ```go
+  nums := []int{1, 2, 3}
+  nums = append(nums, 4)      // [1 2 3 4]
+  fmt.Println(len(nums))      // 4
+  fmt.Println(nums[1:3])      // [2 3]
+  ```
+
+  Loop over a slice with `range`. It gives the index and the value:
+
+  ```go
+  for i, n := range nums {
+  	fmt.Println(i, n)
+  }
+  ```
+
+  Use `_` if you don't need the index: `for _, n := range nums`.
+task: |
+  Write `Evens(nums []int) []int` that returns a **new** slice with only the even numbers, in the same order.
+
+  Example: `Evens([]int{1, 2, 3, 4, 6})` returns `[2 4 6]`.
+hint: |
+  Create an empty slice `var result []int`, then `append` every `n` where `n%2 == 0`.
+starter: |
+  package main
+
+  import "fmt"
+
+  func Evens(nums []int) []int {
+  	// your code here
+  	return nil
+  }
+
+  func main() {
+  	fmt.Println(Evens([]int{1, 2, 3, 4, 6}))
+  }
+tests: |
+  package main
+
+  import (
+  	"slices"
+  	"testing"
+  )
+
+  func TestEvens(t *testing.T) {
+  	cases := []struct{ in, want []int }{
+  		{[]int{1, 2, 3, 4, 6}, []int{2, 4, 6}},
+  		{[]int{1, 3, 5}, nil},
+  		{[]int{0, -2, 7}, []int{0, -2}},
+  	}
+  	for _, c := range cases {
+  		got := Evens(c.in)
+  		if len(got) == 0 && len(c.want) == 0 {
+  			continue
+  		}
+  		if !slices.Equal(got, c.want) {
+  			t.Errorf("Evens(%v) = %v, want %v", c.in, got, c.want)
+  		}
+  	}
+  }
+solution: |
+  package main
+  
+  func Evens(nums []int) []int {
+  	var result []int
+  	for _, n := range nums {
+  		if n%2 == 0 {
+  			result = append(result, n)
+  		}
+  	}
+  	return result
+  }
+  
+  func main() {}

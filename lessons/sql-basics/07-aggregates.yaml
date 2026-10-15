@@ -1,0 +1,23 @@
+title: Aggregate Functions
+type: sql
+xp: 15
+theory: |
+  Aggregate functions turn many rows into one value:
+
+  | Function | Result |
+  |----------|--------|
+  | `COUNT(*)` | number of rows |
+  | `SUM(x)` | sum |
+  | `AVG(x)` | average |
+  | `MIN(x)`, `MAX(x)` | smallest, largest |
+
+  ```sql
+  SELECT COUNT(*) FROM employees WHERE hire_year = 2022;
+  ```
+task: |
+  In **one query**, return three values for all employees: the **number** of employees, the **minimum** salary and the **maximum** salary (in this order).
+hint: |
+  `SELECT COUNT(*), MIN(salary), MAX(salary) FROM employees;`
+starter: |
+  SELECT
+solution: SELECT COUNT(*), MIN(salary), MAX(salary) FROM employees;

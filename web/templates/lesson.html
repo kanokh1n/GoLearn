@@ -1,0 +1,53 @@
+{{define "content"}}
+{{$l := .Lesson}}
+<main class="lesson" data-api="/api/lesson/{{$l.Track.ID}}/{{$l.ID}}" data-kind="{{$l.Kind}}">
+  <section class="pane left">
+    <nav class="crumbs"><a href="/">Tracks</a> / {{$l.Track.Title}}</nav>
+    <h1>{{$l.Title}} {{if done $l.Key}}<span class="badge">✓ done</span>{{end}}</h1>
+
+    <div class="theory">{{markdown $l.Theory}}</div>
+
+    <div class="task">
+      <h3>Task</h3>
+      {{markdown $l.Task}}
+    </div>
+
+    {{range .Tables}}
+    <div class="db-table">
+      <h4>Table <code>{{.Name}}</code></h4>
+      <div class="scroll">
+        <table>
+          <thead><tr>{{range .Columns}}<th>{{.}}</th>{{end}}</tr></thead>
+          <tbody>{{range .Rows}}<tr>{{range .}}<td>{{.}}</td>{{end}}</tr>{{end}}</tbody>
+        </table>
+      </div>
+    </div>
+    {{end}}
+
+    {{if $l.Hint}}
+    <details class="hint">
+      <summary>💡 Show hint</summary>
+      {{markdown $l.Hint}}
+    </details>
+    {{end}}
+  </section>
+
+  <section class="pane right">
+    <textarea id="code">{{.Code}}</textarea>
+    <div class="actions">
+      <button id="run" class="btn">▶ Run <small>Ctrl+Enter</small></button>
+      <button id="check" class="btn primary">✔ Check <small>Ctrl+Shift+Enter</small></button>
+      <button id="reset" class="btn ghost">↺ Reset</button>
+      {{if .Next}}<a class="btn ghost right-btn" href="/lesson/{{$l.Track.ID}}/{{.Next.ID}}">Skip →</a>{{end}}
+    </div>
+    <div id="verdict" class="verdict hidden"></div>
+    <div id="output" class="output"><span class="muted">Output will appear here.</span></div>
+  </section>
+</main>
+<script src="/static/vendor/codemirror/codemirror.js"></script>
+<script src="/static/vendor/codemirror/go.js"></script>
+<script src="/static/vendor/codemirror/sql.js"></script>
+<script src="/static/vendor/codemirror/matchbrackets.js"></script>
+<script src="/static/vendor/codemirror/closebrackets.js"></script>
+<script src="/static/lesson.js"></script>
+{{end}}

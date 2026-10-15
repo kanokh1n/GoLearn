@@ -1,0 +1,49 @@
+title: Variables
+type: go
+xp: 10
+theory: |
+  A variable stores a value. Go has two common ways to declare one:
+
+  ```go
+  var age int = 25   // full form
+  name := "Anna"     // short form: the type is inferred
+  ```
+
+  The short form `:=` works only inside functions.
+
+  `fmt.Println` can print several values separated by spaces:
+
+  ```go
+  fmt.Println(name, "is", age) // Anna is 25
+  ```
+task: |
+  Create a variable `language` with the value `"Go"` and a variable `year` with the value `2009`.
+  Print them so the output is:
+
+  ```
+  Go was created in 2009
+  ```
+hint: |
+  `fmt.Println(language, "was created in", year)`
+starter: |
+  package main
+
+  import "fmt"
+
+  func main() {
+  	// declare language and year
+
+  	// print them
+  }
+expected_output: |
+  Go was created in 2009
+solution: |
+  package main
+  
+  import "fmt"
+  
+  func main() {
+  	language := "Go"
+  	year := 2009
+  	fmt.Println(language, "was created in", year)
+  }

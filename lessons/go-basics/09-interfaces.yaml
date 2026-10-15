@@ -1,0 +1,93 @@
+title: Interfaces
+type: go
+xp: 20
+theory: |
+  An **interface** is a set of methods. Any type that has these methods satisfies the interface automatically — no `implements` keyword:
+
+  ```go
+  type Shape interface {
+  	Area() float64
+  }
+
+  type Square struct{ Side float64 }
+
+  func (s Square) Area() float64 { return s.Side * s.Side }
+
+  var sh Shape = Square{Side: 2} // works: Square has Area()
+  ```
+
+  Interfaces let one function work with many types.
+task: |
+  1. Create `Rect` with fields `W, H float64` and `Circle` with field `R float64`.
+  2. Give both an `Area() float64` method (circle: `math.Pi * R * R`).
+  3. Write `TotalArea(shapes []Shape) float64` that sums the areas.
+
+  The `Shape` interface is already declared.
+hint: |
+  `func (r Rect) Area() float64 { return r.W * r.H }`. In `TotalArea` loop over shapes and add `s.Area()`.
+starter: |
+  package main
+
+  import (
+  	"fmt"
+  	"math"
+  )
+
+  type Shape interface {
+  	Area() float64
+  }
+
+  // your types and methods
+
+  func TotalArea(shapes []Shape) float64 {
+  	return 0
+  }
+
+  func main() {
+  	fmt.Println(math.Pi)
+  }
+tests: |
+  package main
+
+  import (
+  	"math"
+  	"testing"
+  )
+
+  func TestShapes(t *testing.T) {
+  	if got := (Rect{W: 2, H: 3}).Area(); got != 6 {
+  		t.Errorf("Rect{2,3}.Area() = %v, want 6", got)
+  	}
+  	if got := (Circle{R: 1}).Area(); math.Abs(got-math.Pi) > 1e-9 {
+  		t.Errorf("Circle{1}.Area() = %v, want %v", got, math.Pi)
+  	}
+  	total := TotalArea([]Shape{Rect{W: 2, H: 3}, Circle{R: 1}, Rect{W: 1, H: 1}})
+  	if want := 7 + math.Pi; math.Abs(total-want) > 1e-9 {
+  		t.Errorf("TotalArea = %v, want %v", total, want)
+  	}
+  }
+solution: |
+  package main
+  
+  import "math"
+  
+  type Shape interface {
+  	Area() float64
+  }
+  
+  type Rect struct{ W, H float64 }
+  
+  type Circle struct{ R float64 }
+  
+  func (r Rect) Area() float64   { return r.W * r.H }
+  func (c Circle) Area() float64 { return math.Pi * c.R * c.R }
+  
+  func TotalArea(shapes []Shape) float64 {
+  	total := 0.0
+  	for _, s := range shapes {
+  		total += s.Area()
+  	}
+  	return total
+  }
+  
+  func main() {}

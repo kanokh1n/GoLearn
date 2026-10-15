@@ -1,0 +1,98 @@
+title: Structs and Methods
+type: go
+xp: 20
+theory: |
+  A **struct** groups related fields:
+
+  ```go
+  type User struct {
+  	Name string
+  	Age  int
+  }
+
+  u := User{Name: "Anna", Age: 25}
+  fmt.Println(u.Name)
+  ```
+
+  A **method** is a function attached to a type:
+
+  ```go
+  func (u User) Greeting() string {
+  	return "Hi, " + u.Name
+  }
+  ```
+
+  To **change** the struct inside a method, use a **pointer receiver**:
+
+  ```go
+  func (u *User) Birthday() {
+  	u.Age++
+  }
+  ```
+task: |
+  Create a type `Account` with a field `Balance int` and two methods:
+
+  - `Deposit(amount int)` adds money to the balance.
+  - `Withdraw(amount int) bool` takes money only if there is enough. It returns `true` on success and `false` otherwise (the balance must not change).
+hint: |
+  Both methods change the balance, so use pointer receivers: `func (a *Account) Deposit(amount int)`.
+starter: |
+  package main
+
+  import "fmt"
+
+  type Account struct {
+  	// your fields
+  }
+
+  // your methods
+
+  func main() {
+  	acc := &Account{}
+  	acc.Deposit(100)
+  	fmt.Println(acc.Withdraw(30), acc.Balance)
+  }
+tests: |
+  package main
+
+  import "testing"
+
+  func TestAccount(t *testing.T) {
+  	a := &Account{}
+  	a.Deposit(100)
+  	if a.Balance != 100 {
+  		t.Fatalf("after Deposit(100) balance = %d, want 100", a.Balance)
+  	}
+  	if !a.Withdraw(30) {
+  		t.Fatal("Withdraw(30) = false, want true")
+  	}
+  	if a.Balance != 70 {
+  		t.Fatalf("after Withdraw(30) balance = %d, want 70", a.Balance)
+  	}
+  	if a.Withdraw(100) {
+  		t.Fatal("Withdraw(100) with balance 70 = true, want false")
+  	}
+  	if a.Balance != 70 {
+  		t.Fatalf("failed Withdraw changed balance to %d, want 70", a.Balance)
+  	}
+  }
+solution: |
+  package main
+  
+  type Account struct {
+  	Balance int
+  }
+  
+  func (a *Account) Deposit(amount int) {
+  	a.Balance += amount
+  }
+  
+  func (a *Account) Withdraw(amount int) bool {
+  	if amount > a.Balance {
+  		return false
+  	}
+  	a.Balance -= amount
+  	return true
+  }
+  
+  func main() {}

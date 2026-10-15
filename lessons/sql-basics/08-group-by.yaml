@@ -1,0 +1,24 @@
+title: GROUP BY
+type: sql
+xp: 20
+theory: |
+  `GROUP BY` splits rows into groups and applies an aggregate **to each group**:
+
+  ```sql
+  SELECT hire_year, COUNT(*)
+  FROM employees
+  GROUP BY hire_year;
+  ```
+
+  This returns one row per year with the number of people hired that year.
+
+  Rule: every column in `SELECT` must be either in `GROUP BY` or inside an aggregate function.
+task: |
+  For each `department_id`, show the department id and the **average salary** of its employees.
+  (Employees without a department form their own group — that's fine.)
+hint: |
+  `SELECT department_id, AVG(salary) FROM employees GROUP BY department_id;`
+starter: |
+  SELECT department_id,
+  FROM employees
+solution: SELECT department_id, AVG(salary) FROM employees GROUP BY department_id;

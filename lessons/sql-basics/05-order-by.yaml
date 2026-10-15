@@ -1,0 +1,27 @@
+title: ORDER BY and LIMIT
+type: sql
+xp: 15
+ordered: true
+theory: |
+  Rows come back in no particular order unless you sort them:
+
+  ```sql
+  SELECT name, salary FROM employees ORDER BY salary;       -- ascending
+  SELECT name, salary FROM employees ORDER BY salary DESC;  -- descending
+  ```
+
+  `LIMIT n` keeps only the first `n` rows:
+
+  ```sql
+  SELECT name FROM employees ORDER BY hire_year LIMIT 1;  -- the first hire
+  ```
+
+  **In this lesson the order of rows matters.**
+task: |
+  Show the `name` and `salary` of the **3 best-paid** employees, from highest to lowest salary.
+hint: |
+  `ORDER BY salary DESC LIMIT 3`
+starter: |
+  SELECT name, salary
+  FROM employees
+solution: SELECT name, salary FROM employees ORDER BY salary DESC LIMIT 3;

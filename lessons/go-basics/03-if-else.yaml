@@ -1,0 +1,75 @@
+title: If / Else
+type: go
+xp: 10
+theory: |
+  `if` runs code only when a condition is true. No parentheses are needed, but braces are required:
+
+  ```go
+  if temp > 25 {
+  	fmt.Println("hot")
+  } else if temp > 10 {
+  	fmt.Println("warm")
+  } else {
+  	fmt.Println("cold")
+  }
+  ```
+
+  Comparison operators: `==`, `!=`, `<`, `<=`, `>`, `>=`. Logical: `&&` (and), `||` (or), `!` (not).
+task: |
+  Write the function `Grade(score int) string` that returns:
+
+  - `"A"` if score is 90 or more
+  - `"B"` if score is 75–89
+  - `"C"` if score is 50–74
+  - `"F"` otherwise
+
+  Your function is checked with tests, so `main` can print anything.
+hint: |
+  Check the biggest values first: `if score >= 90 { return "A" }`, then `else if score >= 75`, and so on.
+starter: |
+  package main
+
+  import "fmt"
+
+  func Grade(score int) string {
+  	// your code here
+  	return ""
+  }
+
+  func main() {
+  	fmt.Println(Grade(95), Grade(80), Grade(60), Grade(10))
+  }
+tests: |
+  package main
+
+  import "testing"
+
+  func TestGrade(t *testing.T) {
+  	cases := []struct {
+  		score int
+  		want  string
+  	}{
+  		{100, "A"}, {90, "A"}, {89, "B"}, {75, "B"},
+  		{74, "C"}, {50, "C"}, {49, "F"}, {0, "F"},
+  	}
+  	for _, c := range cases {
+  		if got := Grade(c.score); got != c.want {
+  			t.Errorf("Grade(%d) = %q, want %q", c.score, got, c.want)
+  		}
+  	}
+  }
+solution: |
+  package main
+  
+  func Grade(score int) string {
+  	if score >= 90 {
+  		return "A"
+  	} else if score >= 75 {
+  		return "B"
+  	} else if score >= 50 {
+  		return "C"
+  	}
+  	return "F"
+  }
+  
+  func main() {}

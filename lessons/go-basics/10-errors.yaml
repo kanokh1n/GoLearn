@@ -1,0 +1,90 @@
+title: Errors
+type: go
+xp: 20
+theory: |
+  Go has no exceptions. A function that can fail returns an **`error`** as its last value:
+
+  ```go
+  n, err := strconv.Atoi("42x")
+  if err != nil {
+  	fmt.Println("failed:", err)
+  	return
+  }
+  ```
+
+  Create your own errors with `errors.New` or `fmt.Errorf`:
+
+  ```go
+  var ErrEmpty = errors.New("empty input") // a "sentinel" error
+
+  return 0, fmt.Errorf("parse %q: %w", s, err) // %w wraps another error
+  ```
+
+  Check for a specific error with `errors.Is(err, ErrEmpty)`.
+task: |
+  Write `Average(nums []int) (float64, error)`:
+
+  - for an empty slice return `0` and the error `ErrEmpty` (already declared);
+  - otherwise return the average and `nil`.
+hint: |
+  `if len(nums) == 0 { return 0, ErrEmpty }`. Convert to float before dividing: `float64(sum) / float64(len(nums))`.
+starter: |
+  package main
+
+  import (
+  	"errors"
+  	"fmt"
+  )
+
+  var ErrEmpty = errors.New("empty slice")
+
+  func Average(nums []int) (float64, error) {
+  	// your code here
+  	return 0, nil
+  }
+
+  func main() {
+  	fmt.Println(Average([]int{1, 2, 3, 4}))
+  	fmt.Println(Average(nil))
+  }
+tests: |
+  package main
+
+  import (
+  	"errors"
+  	"testing"
+  )
+
+  func TestAverage(t *testing.T) {
+  	got, err := Average([]int{1, 2, 3, 4})
+  	if err != nil || got != 2.5 {
+  		t.Errorf("Average([1 2 3 4]) = %v, %v; want 2.5, nil", got, err)
+  	}
+  	got, err = Average([]int{7})
+  	if err != nil || got != 7 {
+  		t.Errorf("Average([7]) = %v, %v; want 7, nil", got, err)
+  	}
+  	_, err = Average(nil)
+  	if !errors.Is(err, ErrEmpty) {
+  		t.Errorf("Average(nil) error = %v, want ErrEmpty", err)
+  	}
+  }
+solution: |
+  package main
+  
+  import "errors"
+  
+  var ErrEmpty = errors.New("empty slice")
+  
+  func Average(nums []int) (float64, error) {
+  	if len(nums) == 0 {
+  		return 0, ErrEmpty
+  	}
+  	sum := 0
+  	for _, n := range nums {
+  		sum += n
+  	}
+  	return float64(sum) / float64(len(nums)), nil
+  }
+  
+  func main() {}

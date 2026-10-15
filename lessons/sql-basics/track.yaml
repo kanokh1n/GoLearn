@@ -1,0 +1,33 @@
+title: SQL Basics
+description: Query a small company database, from SELECT to JOIN and subqueries.
+order: 2
+setup: |
+  CREATE TABLE departments (
+    id   INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    city TEXT NOT NULL
+  );
+  INSERT INTO departments VALUES
+    (1, 'Engineering', 'Moscow'),
+    (2, 'Marketing',   'Kazan'),
+    (3, 'Sales',       'Moscow'),
+    (4, 'Support',     'Novosibirsk');
+
+  CREATE TABLE employees (
+    id            INTEGER PRIMARY KEY,
+    name          TEXT NOT NULL,
+    department_id INTEGER REFERENCES departments(id),
+    salary        INTEGER NOT NULL,
+    hire_year     INTEGER NOT NULL
+  );
+  INSERT INTO employees VALUES
+    (1,  'Anna',    1, 250000, 2019),
+    (2,  'Ivan',    1, 180000, 2021),
+    (3,  'Olga',    1, 320000, 2016),
+    (4,  'Petr',    2, 120000, 2022),
+    (5,  'Maria',   2, 150000, 2020),
+    (6,  'Sergey',  3, 110000, 2023),
+    (7,  'Elena',   3, 140000, 2018),
+    (8,  'Dmitry',  3,  95000, 2024),
+    (9,  'Kate',    1, 210000, 2022),
+    (10, 'Alex',    NULL, 90000, 2024);

@@ -1,0 +1,22 @@
+title: Choosing Columns
+type: sql
+xp: 10
+theory: |
+  Instead of `*` you can list the columns you need, separated by commas:
+
+  ```sql
+  SELECT name, city FROM departments;
+  ```
+
+  You can also rename a column in the result with `AS`:
+
+  ```sql
+  SELECT name AS department FROM departments;
+  ```
+task: |
+  Select only the `name` and `salary` of every employee.
+hint: |
+  `SELECT name, salary FROM ...`
+starter: |
+  SELECT
+solution: SELECT name, salary FROM employees;
