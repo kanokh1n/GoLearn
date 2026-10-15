@@ -1,5 +1,5 @@
-title: SQL Basics
-description: Query a small company database, from SELECT to JOIN and subqueries.
+title: Основы SQL
+description: Пишем запросы к небольшой базе компании, от SELECT до JOIN и подзапросов.
 order: 2
 setup: |
   CREATE TABLE departments (

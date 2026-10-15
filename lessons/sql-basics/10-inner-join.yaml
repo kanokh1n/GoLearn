@@ -2,8 +2,8 @@ title: INNER JOIN
 type: sql
 xp: 20
 theory: |
-  Data is often split between tables. `employees.department_id` points to `departments.id`.
-  **JOIN** combines rows from two tables:
+  Данные часто разнесены по разным таблицам. `employees.department_id` ссылается на `departments.id`.
+  **JOIN** соединяет строки двух таблиц:
 
   ```sql
   SELECT e.name, d.name
@@ -11,11 +11,11 @@ theory: |
   JOIN departments d ON d.id = e.department_id;
   ```
 
-  `e` and `d` are short **aliases**. `INNER JOIN` (or just `JOIN`) keeps only rows that have a match in **both** tables, so Alex (no department) disappears.
+  `e` и `d` — короткие **псевдонимы** (алиасы). `INNER JOIN` (или просто `JOIN`) оставляет только строки, у которых есть пара в **обеих** таблицах, поэтому Alex (без отдела) пропадёт.
 task: |
-  Show each employee's `name` and the `city` where their department is located.
+  Покажи `name` каждого сотрудника и `city`, в котором находится его отдел.
 hint: |
-  Join `employees` with `departments` on `departments.id = employees.department_id` and select `e.name, d.city`.
+  Соедини `employees` и `departments` по условию `departments.id = employees.department_id` и выбери `e.name, d.city`.
 starter: |
   SELECT
   FROM employees e

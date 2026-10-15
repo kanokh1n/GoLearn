@@ -23,9 +23,9 @@ func TestCheckSQL(t *testing.T) {
 	}{
 		{"same query", "SELECT * FROM t", "SELECT * FROM t", false, true, ""},
 		{"different order is fine when unordered", "SELECT id FROM t ORDER BY id DESC", "SELECT id FROM t", false, true, ""},
-		{"different order fails when ordered", "SELECT id FROM t ORDER BY id DESC", "SELECT id FROM t ORDER BY id", true, false, "order"},
-		{"column count", "SELECT id, name FROM t", "SELECT id FROM t", false, false, "column"},
-		{"row count", "SELECT id FROM t WHERE id > 1", "SELECT id FROM t", false, false, "row"},
+		{"different order fails when ordered", "SELECT id FROM t ORDER BY id DESC", "SELECT id FROM t ORDER BY id", true, false, "порядке"},
+		{"column count", "SELECT id, name FROM t", "SELECT id FROM t", false, false, "столбцов"},
+		{"row count", "SELECT id FROM t WHERE id > 1", "SELECT id FROM t", false, false, "строк"},
 		{"aliases do not matter", "SELECT id AS x FROM t", "SELECT id FROM t", false, true, ""},
 		{"float rounding", "SELECT AVG(score) FROM t", "SELECT 1.75", false, true, ""},
 	}

@@ -2,7 +2,7 @@ title: If / Else
 type: go
 xp: 10
 theory: |
-  `if` runs code only when a condition is true. No parentheses are needed, but braces are required:
+  `if` выполняет код, только если условие истинно. Скобки вокруг условия не нужны, а фигурные скобки обязательны:
 
   ```go
   if temp > 25 {
@@ -14,25 +14,25 @@ theory: |
   }
   ```
 
-  Comparison operators: `==`, `!=`, `<`, `<=`, `>`, `>=`. Logical: `&&` (and), `||` (or), `!` (not).
+  Операторы сравнения: `==`, `!=`, `<`, `<=`, `>`, `>=`. Логические: `&&` (и), `||` (или), `!` (не).
 task: |
-  Write the function `Grade(score int) string` that returns:
+  Напиши функцию `Grade(score int) string`, которая возвращает:
 
-  - `"A"` if score is 90 or more
-  - `"B"` if score is 75–89
-  - `"C"` if score is 50–74
-  - `"F"` otherwise
+  - `"A"`, если баллов 90 или больше;
+  - `"B"`, если 75–89;
+  - `"C"`, если 50–74;
+  - `"F"` во всех остальных случаях.
 
-  Your function is checked with tests, so `main` can print anything.
+  Функция проверяется тестами, поэтому `main` может выводить что угодно.
 hint: |
-  Check the biggest values first: `if score >= 90 { return "A" }`, then `else if score >= 75`, and so on.
+  Сначала проверяй большие значения: `if score >= 90 { return "A" }`, потом `else if score >= 75` и так далее.
 starter: |
   package main
 
   import "fmt"
 
   func Grade(score int) string {
-  	// your code here
+  	// твой код здесь
   	return ""
   }
 

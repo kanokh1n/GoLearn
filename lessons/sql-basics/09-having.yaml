@@ -2,7 +2,7 @@ title: HAVING
 type: sql
 xp: 20
 theory: |
-  `WHERE` filters **rows before** grouping. `HAVING` filters **groups after** grouping:
+  `WHERE` фильтрует **строки до** группировки. `HAVING` фильтрует **группы после** группировки:
 
   ```sql
   SELECT department_id, COUNT(*)
@@ -11,9 +11,9 @@ theory: |
   HAVING COUNT(*) > 2;
   ```
 
-  Order of a query: `SELECT … FROM … WHERE … GROUP BY … HAVING … ORDER BY … LIMIT …`
+  Порядок частей запроса: `SELECT … FROM … WHERE … GROUP BY … HAVING … ORDER BY … LIMIT …`
 task: |
-  Show `department_id` and the **total salary** (`SUM`) of departments whose total salary is **more than 400000**.
+  Покажи `department_id` и **общую сумму зарплат** (`SUM`) отделов, у которых эта сумма **больше 400000**.
 hint: |
   `GROUP BY department_id HAVING SUM(salary) > 400000`
 starter: |

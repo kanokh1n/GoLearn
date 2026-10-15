@@ -139,9 +139,9 @@ func checkGo(r *http.Request, l *lesson.Lesson, code string) (checkResult, error
 			return checkResult{}, err
 		}
 		if out.ExitCode == 0 {
-			return checkResult{OK: true, Message: "All tests passed!", Output: out.Output}, nil
+			return checkResult{OK: true, Message: "Все тесты пройдены!", Output: out.Output}, nil
 		}
-		return checkResult{Message: "Some tests failed. Read the output below.", Output: out.Output}, nil
+		return checkResult{Message: "Некоторые тесты не прошли. Посмотри вывод ниже.", Output: out.Output}, nil
 	}
 
 	out, err := runner.RunGo(r.Context(), code)
@@ -149,27 +149,27 @@ func checkGo(r *http.Request, l *lesson.Lesson, code string) (checkResult, error
 		return checkResult{}, err
 	}
 	if out.ExitCode != 0 {
-		return checkResult{Message: "The program did not run successfully.", Output: out.Output}, nil
+		return checkResult{Message: "Программа завершилась с ошибкой.", Output: out.Output}, nil
 	}
 	if normalizeOutput(out.Output) != normalizeOutput(l.ExpectedOutput) {
 		return checkResult{
-			Message: fmt.Sprintf("Wrong output.\nExpected:\n%s", normalizeOutput(l.ExpectedOutput)),
+			Message: fmt.Sprintf("Неверный вывод.\nОжидалось:\n%s", normalizeOutput(l.ExpectedOutput)),
 			Output:  out.Output,
 		}, nil
 	}
-	return checkResult{OK: true, Message: "Correct!", Output: out.Output}, nil
+	return checkResult{OK: true, Message: "Верно!", Output: out.Output}, nil
 }
 
 func checkSQL(r *http.Request, l *lesson.Lesson, code string) (checkResult, error) {
 	got, ok, reason, err := runner.CheckSQL(r.Context(), l.SQLSetup(), code, l.Solution, l.Ordered)
 	if err != nil {
 		// A syntax error in the user's query is a normal answer, not a server failure.
-		return checkResult{Message: "Your query has an error.", Error: err.Error()}, nil
+		return checkResult{Message: "В запросе ошибка.", Error: err.Error()}, nil
 	}
 	if !ok {
 		return checkResult{Message: reason, Table: &got}, nil
 	}
-	return checkResult{OK: true, Message: "Correct!", Table: &got}, nil
+	return checkResult{OK: true, Message: "Верно!", Table: &got}, nil
 }
 
 func (s *Server) reset(w http.ResponseWriter, r *http.Request, l *lesson.Lesson, _ string) {

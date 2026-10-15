@@ -1,21 +1,21 @@
-title: Aggregate Functions
+title: Агрегатные функции
 type: sql
 xp: 15
 theory: |
-  Aggregate functions turn many rows into one value:
+  Агрегатные функции превращают много строк в одно значение:
 
-  | Function | Result |
-  |----------|--------|
-  | `COUNT(*)` | number of rows |
-  | `SUM(x)` | sum |
-  | `AVG(x)` | average |
-  | `MIN(x)`, `MAX(x)` | smallest, largest |
+  | Функция | Результат |
+  |---------|-----------|
+  | `COUNT(*)` | количество строк |
+  | `SUM(x)` | сумма |
+  | `AVG(x)` | среднее |
+  | `MIN(x)`, `MAX(x)` | минимум, максимум |
 
   ```sql
   SELECT COUNT(*) FROM employees WHERE hire_year = 2022;
   ```
 task: |
-  In **one query**, return three values for all employees: the **number** of employees, the **minimum** salary and the **maximum** salary (in this order).
+  **Одним запросом** верни три значения по всем сотрудникам: **количество** сотрудников, **минимальную** и **максимальную** зарплату (в этом порядке).
 hint: |
   `SELECT COUNT(*), MIN(salary), MAX(salary) FROM employees;`
 starter: |

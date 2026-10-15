@@ -1,8 +1,8 @@
-title: Functions
+title: Функции
 type: go
 xp: 15
 theory: |
-  A function has a name, parameters with types and a return type:
+  У функции есть имя, параметры с типами и тип результата:
 
   ```go
   func add(a int, b int) int {
@@ -10,9 +10,9 @@ theory: |
   }
   ```
 
-  Parameters of the same type can share it: `func add(a, b int) int`.
+  Если у параметров один тип, его можно написать один раз: `func add(a, b int) int`.
 
-  Functions can return **several values**. This is used everywhere in Go:
+  Функция может возвращать **несколько значений**. В Go это используется повсюду:
 
   ```go
   func divmod(a, b int) (int, int) {
@@ -22,18 +22,18 @@ theory: |
   q, r := divmod(17, 5) // 3, 2
   ```
 task: |
-  Write `MinMax(nums []int) (int, int)` that returns the smallest and the largest number of a non-empty slice.
+  Напиши `MinMax(nums []int) (int, int)`, которая возвращает наименьшее и наибольшее число непустого слайса.
 
-  Example: `MinMax([]int{3, -1, 7, 2})` returns `-1, 7`.
+  Пример: `MinMax([]int{3, -1, 7, 2})` возвращает `-1, 7`.
 hint: |
-  Start with `min, max := nums[0], nums[0]`, then loop over the slice with `for _, n := range nums` and update them.
+  Начни с `min, max := nums[0], nums[0]`, затем пройди по слайсу через `for _, n := range nums` и обновляй значения.
 starter: |
   package main
 
   import "fmt"
 
   func MinMax(nums []int) (int, int) {
-  	// your code here
+  	// твой код здесь
   	return 0, 0
   }
 

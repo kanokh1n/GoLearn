@@ -2,19 +2,19 @@
 {{$l := .Lesson}}
 <main class="lesson" data-api="/api/lesson/{{$l.Track.ID}}/{{$l.ID}}" data-kind="{{$l.Kind}}">
   <section class="pane left">
-    <nav class="crumbs"><a href="/">Tracks</a> / {{$l.Track.Title}}</nav>
-    <h1>{{$l.Title}} {{if done $l.Key}}<span class="badge">✓ done</span>{{end}}</h1>
+    <nav class="crumbs"><a href="/">Треки</a> / {{$l.Track.Title}}</nav>
+    <h1>{{$l.Title}} {{if done $l.Key}}<span class="badge">✓ пройдено</span>{{end}}</h1>
 
     <div class="theory">{{markdown $l.Theory}}</div>
 
     <div class="task">
-      <h3>Task</h3>
+      <h3>Задание</h3>
       {{markdown $l.Task}}
     </div>
 
     {{range .Tables}}
     <div class="db-table">
-      <h4>Table <code>{{.Name}}</code></h4>
+      <h4>Таблица <code>{{.Name}}</code></h4>
       <div class="scroll">
         <table>
           <thead><tr>{{range .Columns}}<th>{{.}}</th>{{end}}</tr></thead>
@@ -26,7 +26,7 @@
 
     {{if $l.Hint}}
     <details class="hint">
-      <summary>💡 Show hint</summary>
+      <summary>💡 Подсказка</summary>
       {{markdown $l.Hint}}
     </details>
     {{end}}
@@ -35,13 +35,13 @@
   <section class="pane right">
     <textarea id="code">{{.Code}}</textarea>
     <div class="actions">
-      <button id="run" class="btn">▶ Run <small>Ctrl+Enter</small></button>
-      <button id="check" class="btn primary">✔ Check <small>Ctrl+Shift+Enter</small></button>
-      <button id="reset" class="btn ghost">↺ Reset</button>
-      {{if .Next}}<a class="btn ghost right-btn" href="/lesson/{{$l.Track.ID}}/{{.Next.ID}}">Skip →</a>{{end}}
+      <button id="run" class="btn">▶ Запустить <small>Ctrl+Enter</small></button>
+      <button id="check" class="btn primary">✔ Проверить <small>Ctrl+Shift+Enter</small></button>
+      <button id="reset" class="btn ghost">↺ Сбросить</button>
+      {{if .Next}}<a class="btn ghost right-btn" href="/lesson/{{$l.Track.ID}}/{{.Next.ID}}">Пропустить →</a>{{end}}
     </div>
     <div id="verdict" class="verdict hidden"></div>
-    <div id="output" class="output"><span class="muted">Output will appear here.</span></div>
+    <div id="output" class="output"><span class="muted">Здесь появится результат.</span></div>
   </section>
 </main>
 <script src="/static/vendor/codemirror/codemirror.js"></script>

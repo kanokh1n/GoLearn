@@ -2,19 +2,19 @@ title: SELECT *
 type: sql
 xp: 10
 theory: |
-  **SQL** is the language for talking to relational databases. Data lives in **tables** made of rows and columns.
+  **SQL** — язык для работы с реляционными базами данных. Данные хранятся в **таблицах** из строк и столбцов.
 
-  The simplest query reads everything from a table:
+  Самый простой запрос читает из таблицы всё:
 
   ```sql
   SELECT * FROM departments;
   ```
 
-  `*` means "all columns". Look at the tables on this page: this is the data your queries run against.
+  `*` означает «все столбцы». Посмотри на таблицы на этой странице: именно к этим данным выполняются твои запросы.
 task: |
-  Select **all columns** of **all employees**.
+  Выбери **все столбцы** **всех сотрудников**.
 hint: |
   `SELECT * FROM employees;`
 starter: |
-  -- write your query here
+  -- напиши запрос здесь
 solution: SELECT * FROM employees;

@@ -2,9 +2,9 @@ title: Hello, World!
 type: go
 xp: 10
 theory: |
-  Every Go program starts in **package `main`** with a function called **`main`**.
+  Любая программа на Go начинается с **пакета `main`** и функции **`main`**.
 
-  To print text, we import the `fmt` package and call `fmt.Println`:
+  Чтобы вывести текст, импортируем пакет `fmt` и вызываем `fmt.Println`:
 
   ```go
   package main
@@ -16,22 +16,22 @@ theory: |
   }
   ```
 
-  `Println` prints its arguments and adds a new line at the end.
+  `Println` печатает свои аргументы и в конце переводит строку.
 task: |
-  Write a program that prints exactly:
+  Напиши программу, которая выводит ровно:
 
   ```
   Hello, World!
   ```
 hint: |
-  Replace the comment with `fmt.Println("Hello, World!")`. Mind the comma and the exclamation mark.
+  Замени комментарий на `fmt.Println("Hello, World!")`. Не забудь запятую и восклицательный знак.
 starter: |
   package main
 
   import "fmt"
 
   func main() {
-  	// print "Hello, World!" here
+  	// выведи здесь "Hello, World!"
   }
 expected_output: |
   Hello, World!

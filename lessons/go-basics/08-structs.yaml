@@ -1,8 +1,8 @@
-title: Structs and Methods
+title: Структуры и методы
 type: go
 xp: 20
 theory: |
-  A **struct** groups related fields:
+  **Структура** объединяет связанные поля:
 
   ```go
   type User struct {
@@ -14,7 +14,7 @@ theory: |
   fmt.Println(u.Name)
   ```
 
-  A **method** is a function attached to a type:
+  **Метод** — это функция, привязанная к типу:
 
   ```go
   func (u User) Greeting() string {
@@ -22,7 +22,7 @@ theory: |
   }
   ```
 
-  To **change** the struct inside a method, use a **pointer receiver**:
+  Чтобы метод мог **изменить** структуру, нужен **pointer receiver** (получатель-указатель):
 
   ```go
   func (u *User) Birthday() {
@@ -30,22 +30,22 @@ theory: |
   }
   ```
 task: |
-  Create a type `Account` with a field `Balance int` and two methods:
+  Создай тип `Account` с полем `Balance int` и двумя методами:
 
-  - `Deposit(amount int)` adds money to the balance.
-  - `Withdraw(amount int) bool` takes money only if there is enough. It returns `true` on success and `false` otherwise (the balance must not change).
+  - `Deposit(amount int)` — пополняет баланс;
+  - `Withdraw(amount int) bool` — снимает деньги, только если их хватает. Возвращает `true` при успехе и `false` иначе (баланс при этом не меняется).
 hint: |
-  Both methods change the balance, so use pointer receivers: `func (a *Account) Deposit(amount int)`.
+  Оба метода меняют баланс, поэтому используй получатель-указатель: `func (a *Account) Deposit(amount int)`.
 starter: |
   package main
 
   import "fmt"
 
   type Account struct {
-  	// your fields
+  	// твои поля
   }
 
-  // your methods
+  // твои методы
 
   func main() {
   	acc := &Account{}

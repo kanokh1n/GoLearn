@@ -39,10 +39,10 @@
   }
 
   function renderTable(t) {
-    if (!t.columns || t.columns.length === 0) return '<span class="muted">Query returned no columns.</span>';
+    if (!t.columns || t.columns.length === 0) return '<span class="muted">Запрос не вернул ни одного столбца.</span>';
     const head = t.columns.map((c) => `<th>${esc(c)}</th>`).join("");
     const rows = t.rows.map((r) => `<tr>${r.map((v) => `<td>${esc(v)}</td>`).join("")}</tr>`).join("");
-    return `<div class="muted small">${t.rows.length} row(s)</div><div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
+    return `<div class="muted small">${t.rows.length} строк</div><div class="scroll"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`;
   }
 
   function showResult(data) {
@@ -53,13 +53,13 @@
     } else if (data.output !== undefined) {
       output.innerHTML = data.output
         ? `<pre>${esc(data.output)}</pre>`
-        : '<span class="muted">(no output)</span>';
+        : '<span class="muted">(нет вывода)</span>';
     }
   }
 
   function busy(on) {
     document.querySelectorAll(".actions button").forEach((b) => (b.disabled = on));
-    if (on) output.innerHTML = '<span class="muted">Running…</span>';
+    if (on) output.innerHTML = '<span class="muted">Выполняется…</span>';
   }
 
   async function run() {
@@ -81,7 +81,7 @@
       showResult(data);
       if (data.ok) {
         const gained = data.firstTime ? ` +${data.xp} XP` : "";
-        verdict.innerHTML = `<span>✅ ${esc(data.message)}${gained}</span><a class="btn primary" href="${data.nextUrl}">${data.nextUrl === "/" ? "Back to tracks" : "Next lesson →"}</a>`;
+        verdict.innerHTML = `<span>✅ ${esc(data.message)}${gained}</span><a class="btn primary" href="${data.nextUrl}">${data.nextUrl === "/" ? "К трекам" : "Следующий урок →"}</a>`;
         verdict.className = "verdict ok";
         document.getElementById("total-xp").textContent = data.totalXp;
       } else {
@@ -96,11 +96,11 @@
   }
 
   async function reset() {
-    if (!confirm("Reset your code to the starter code?")) return;
+    if (!confirm("Вернуть стартовый код? Твой код будет удалён.")) return;
     const data = await post("reset");
     editor.setValue(data.code);
     verdict.className = "verdict hidden";
-    output.innerHTML = '<span class="muted">Output will appear here.</span>';
+    output.innerHTML = '<span class="muted">Здесь появится результат.</span>';
   }
 
   document.getElementById("run").addEventListener("click", run);

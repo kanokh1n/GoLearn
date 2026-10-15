@@ -1,22 +1,22 @@
-title: Subqueries
+title: Подзапросы
 type: sql
 xp: 25
 theory: |
-  A **subquery** is a query inside another query. It can produce a single value:
+  **Подзапрос** — это запрос внутри другого запроса. Он может вернуть одно значение:
 
   ```sql
   SELECT name FROM employees
   WHERE hire_year = (SELECT MIN(hire_year) FROM employees);
   ```
 
-  or a list for `IN`:
+  или список для `IN`:
 
   ```sql
   SELECT name FROM employees
   WHERE department_id IN (SELECT id FROM departments WHERE city = 'Moscow');
   ```
 task: |
-  Find the `name` and `salary` of employees who earn **more than the average salary** of all employees.
+  Найди `name` и `salary` сотрудников, которые получают **больше средней зарплаты** по всем сотрудникам.
 hint: |
   `WHERE salary > (SELECT AVG(salary) FROM employees)`
 starter: |

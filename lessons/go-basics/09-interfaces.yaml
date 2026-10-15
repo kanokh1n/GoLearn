@@ -1,8 +1,8 @@
-title: Interfaces
+title: Интерфейсы
 type: go
 xp: 20
 theory: |
-  An **interface** is a set of methods. Any type that has these methods satisfies the interface automatically — no `implements` keyword:
+  **Интерфейс** — это набор методов. Любой тип, у которого есть эти методы, автоматически реализует интерфейс, ключевого слова `implements` нет:
 
   ```go
   type Shape interface {
@@ -13,18 +13,18 @@ theory: |
 
   func (s Square) Area() float64 { return s.Side * s.Side }
 
-  var sh Shape = Square{Side: 2} // works: Square has Area()
+  var sh Shape = Square{Side: 2} // работает: у Square есть Area()
   ```
 
-  Interfaces let one function work with many types.
+  Интерфейсы позволяют одной функции работать со многими типами.
 task: |
-  1. Create `Rect` with fields `W, H float64` and `Circle` with field `R float64`.
-  2. Give both an `Area() float64` method (circle: `math.Pi * R * R`).
-  3. Write `TotalArea(shapes []Shape) float64` that sums the areas.
+  1. Создай `Rect` с полями `W, H float64` и `Circle` с полем `R float64`.
+  2. Добавь обоим метод `Area() float64` (для круга: `math.Pi * R * R`).
+  3. Напиши `TotalArea(shapes []Shape) float64`, которая суммирует площади.
 
-  The `Shape` interface is already declared.
+  Интерфейс `Shape` уже объявлен.
 hint: |
-  `func (r Rect) Area() float64 { return r.W * r.H }`. In `TotalArea` loop over shapes and add `s.Area()`.
+  `func (r Rect) Area() float64 { return r.W * r.H }`. В `TotalArea` пройди по фигурам и складывай `s.Area()`.
 starter: |
   package main
 
@@ -37,7 +37,7 @@ starter: |
   	Area() float64
   }
 
-  // your types and methods
+  // твои типы и методы
 
   func TotalArea(shapes []Shape) float64 {
   	return 0

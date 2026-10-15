@@ -102,7 +102,7 @@ func (s *Server) withLesson(h lessonHandler) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		l, ok := s.catalog.Lesson(r.PathValue("track"), r.PathValue("lesson"))
 		if !ok {
-			writeJSON(w, http.StatusNotFound, map[string]string{"error": "lesson not found"})
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "урок не найден"})
 			return
 		}
 		var body struct {
@@ -111,7 +111,7 @@ func (s *Server) withLesson(h lessonHandler) http.HandlerFunc {
 		r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 		if r.ContentLength != 0 {
 			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-				writeJSON(w, http.StatusBadRequest, map[string]string{"error": "bad request body"})
+				writeJSON(w, http.StatusBadRequest, map[string]string{"error": "некорректное тело запроса"})
 				return
 			}
 		}

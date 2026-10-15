@@ -34,7 +34,7 @@ func openDB(ctx context.Context, setup string) (*sql.DB, error) {
 	db.SetMaxOpenConns(1)
 	if _, err := db.ExecContext(ctx, setup); err != nil {
 		db.Close()
-		return nil, fmt.Errorf("lesson setup failed: %w", err)
+		return nil, fmt.Errorf("ошибка подготовки базы урока: %w", err)
 	}
 	return db, nil
 }
@@ -98,7 +98,7 @@ func CheckSQL(ctx context.Context, setup, query, solution string, ordered bool) 
 	}
 	want, err := RunSQL(ctx, setup, solution)
 	if err != nil {
-		return got, false, "", fmt.Errorf("reference solution failed: %w", err)
+		return got, false, "", fmt.Errorf("эталонное решение не выполнилось: %w", err)
 	}
 	ok, reason := sameResult(got, want, ordered)
 	return got, ok, reason, nil
@@ -106,10 +106,10 @@ func CheckSQL(ctx context.Context, setup, query, solution string, ordered bool) 
 
 func sameResult(got, want Table, ordered bool) (bool, string) {
 	if len(got.Columns) != len(want.Columns) {
-		return false, fmt.Sprintf("Expected %d column(s), got %d.", len(want.Columns), len(got.Columns))
+		return false, fmt.Sprintf("Ожидалось столбцов: %d, получено: %d.", len(want.Columns), len(got.Columns))
 	}
 	if len(got.Rows) != len(want.Rows) {
-		return false, fmt.Sprintf("Expected %d row(s), got %d.", len(want.Rows), len(got.Rows))
+		return false, fmt.Sprintf("Ожидалось строк: %d, получено: %d.", len(want.Rows), len(got.Rows))
 	}
 	g, w := joinRows(got.Rows), joinRows(want.Rows)
 	if !ordered {
@@ -119,9 +119,9 @@ func sameResult(got, want Table, ordered bool) (bool, string) {
 	for i := range g {
 		if g[i] != w[i] {
 			if ordered {
-				return false, "The rows are different or in the wrong order."
+				return false, "Строки отличаются от ожидаемых или идут в неправильном порядке."
 			}
-			return false, "The rows are different from the expected result."
+			return false, "Строки отличаются от ожидаемого результата."
 		}
 	}
 	return true, ""

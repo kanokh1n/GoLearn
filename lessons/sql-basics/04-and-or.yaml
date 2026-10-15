@@ -2,21 +2,21 @@ title: AND, OR, IN, BETWEEN
 type: sql
 xp: 15
 theory: |
-  Combine conditions with `AND` and `OR`:
+  Условия объединяются через `AND` и `OR`:
 
   ```sql
   SELECT * FROM employees WHERE department_id = 1 AND hire_year >= 2020;
   ```
 
-  Handy shortcuts:
+  Полезные сокращения:
 
   ```sql
-  WHERE department_id IN (2, 3)        -- same as = 2 OR = 3
-  WHERE salary BETWEEN 100000 AND 150000  -- inclusive
-  WHERE department_id IS NULL          -- NULL is checked with IS, not =
+  WHERE department_id IN (2, 3)           -- то же, что = 2 OR = 3
+  WHERE salary BETWEEN 100000 AND 150000  -- включительно
+  WHERE department_id IS NULL             -- NULL проверяют через IS, а не =
   ```
 task: |
-  Find the `name` of employees from departments **2 or 3** who were hired **in 2020 or later**.
+  Найди `name` сотрудников из отделов **2 или 3**, нанятых **в 2020 году или позже**.
 hint: |
   `WHERE department_id IN (2, 3) AND hire_year >= 2020`
 starter: |

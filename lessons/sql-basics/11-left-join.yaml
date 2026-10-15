@@ -2,7 +2,7 @@ title: LEFT JOIN
 type: sql
 xp: 25
 theory: |
-  `LEFT JOIN` keeps **all** rows from the left table, even without a match. Missing values on the right become `NULL`:
+  `LEFT JOIN` сохраняет **все** строки левой таблицы, даже если пары для них нет. Недостающие значения справа становятся `NULL`:
 
   ```sql
   SELECT d.name, e.name
@@ -10,13 +10,13 @@ theory: |
   LEFT JOIN employees e ON e.department_id = d.id;
   ```
 
-  The Support department has no employees, so it appears with `NULL`.
+  В отделе Support нет сотрудников, поэтому он появится с `NULL`.
 
-  Note: `COUNT(e.id)` counts only non-NULL values, while `COUNT(*)` counts all rows.
+  Обрати внимание: `COUNT(e.id)` считает только значения, отличные от NULL, а `COUNT(*)` считает все строки.
 task: |
-  For **every** department show its `name` and the **number of employees** in it. Departments without employees must show `0`.
+  Для **каждого** отдела покажи его `name` и **количество сотрудников**. У отделов без сотрудников должен быть `0`.
 hint: |
-  `LEFT JOIN employees e ON e.department_id = d.id`, then `GROUP BY d.id, d.name` and `COUNT(e.id)`.
+  `LEFT JOIN employees e ON e.department_id = d.id`, затем `GROUP BY d.id, d.name` и `COUNT(e.id)`.
 starter: |
   SELECT d.name,
   FROM departments d

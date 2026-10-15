@@ -1,8 +1,8 @@
-title: Errors
+title: Ошибки
 type: go
 xp: 20
 theory: |
-  Go has no exceptions. A function that can fail returns an **`error`** as its last value:
+  В Go нет исключений. Функция, которая может завершиться неудачей, возвращает **`error`** последним значением:
 
   ```go
   n, err := strconv.Atoi("42x")
@@ -12,22 +12,22 @@ theory: |
   }
   ```
 
-  Create your own errors with `errors.New` or `fmt.Errorf`:
+  Свои ошибки создают через `errors.New` или `fmt.Errorf`:
 
   ```go
-  var ErrEmpty = errors.New("empty input") // a "sentinel" error
+  var ErrEmpty = errors.New("empty input") // "sentinel"-ошибка
 
-  return 0, fmt.Errorf("parse %q: %w", s, err) // %w wraps another error
+  return 0, fmt.Errorf("parse %q: %w", s, err) // %w оборачивает другую ошибку
   ```
 
-  Check for a specific error with `errors.Is(err, ErrEmpty)`.
+  Проверить конкретную ошибку можно через `errors.Is(err, ErrEmpty)`.
 task: |
-  Write `Average(nums []int) (float64, error)`:
+  Напиши `Average(nums []int) (float64, error)`:
 
-  - for an empty slice return `0` and the error `ErrEmpty` (already declared);
-  - otherwise return the average and `nil`.
+  - для пустого слайса верни `0` и ошибку `ErrEmpty` (она уже объявлена);
+  - иначе верни среднее значение и `nil`.
 hint: |
-  `if len(nums) == 0 { return 0, ErrEmpty }`. Convert to float before dividing: `float64(sum) / float64(len(nums))`.
+  `if len(nums) == 0 { return 0, ErrEmpty }`. Перед делением приведи к float: `float64(sum) / float64(len(nums))`.
 starter: |
   package main
 
@@ -39,7 +39,7 @@ starter: |
   var ErrEmpty = errors.New("empty slice")
 
   func Average(nums []int) (float64, error) {
-  	// your code here
+  	// твой код здесь
   	return 0, nil
   }
 

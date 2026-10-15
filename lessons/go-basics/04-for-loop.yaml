@@ -1,26 +1,26 @@
-title: For Loops
+title: Цикл for
 type: go
 xp: 10
 theory: |
-  Go has only one loop keyword: **`for`**. It has three forms:
+  В Go есть только одно ключевое слово для циклов: **`for`**. У него три формы:
 
   ```go
-  for i := 0; i < 3; i++ { }   // classic
-  for n < 100 { }              // like "while"
-  for { }                      // infinite, stop with break
+  for i := 0; i < 3; i++ { }   // классический
+  for n < 100 { }              // как "while"
+  for { }                      // бесконечный, выход через break
   ```
 
-  `break` leaves the loop, `continue` jumps to the next iteration.
+  `break` выходит из цикла, `continue` переходит к следующей итерации.
 task: |
-  Print the numbers from 1 to 15, one per line, but:
+  Выведи числа от 1 до 15, каждое с новой строки, но:
 
-  - for multiples of 3 print `Fizz`
-  - for multiples of 5 print `Buzz`
-  - for multiples of both print `FizzBuzz`
+  - вместо чисел, кратных 3, выводи `Fizz`;
+  - вместо кратных 5 выводи `Buzz`;
+  - вместо кратных и 3, и 5 выводи `FizzBuzz`.
 
-  This is the famous **FizzBuzz** interview task.
+  Это знаменитая задача с собеседований **FizzBuzz**.
 hint: |
-  Use `%` (remainder): `i%3 == 0` means `i` is divisible by 3. Check `i%15 == 0` first.
+  Используй `%` (остаток от деления): `i%3 == 0` значит, что `i` делится на 3. Первым проверяй `i%15 == 0`.
 starter: |
   package main
 
@@ -28,7 +28,7 @@ starter: |
 
   func main() {
   	for i := 1; i <= 15; i++ {
-  		// your code here
+  		// твой код здесь
   		fmt.Println(i)
   	}
   }

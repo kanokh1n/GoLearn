@@ -2,7 +2,7 @@ title: GROUP BY
 type: sql
 xp: 20
 theory: |
-  `GROUP BY` splits rows into groups and applies an aggregate **to each group**:
+  `GROUP BY` разбивает строки на группы и применяет агрегатную функцию **к каждой группе**:
 
   ```sql
   SELECT hire_year, COUNT(*)
@@ -10,12 +10,12 @@ theory: |
   GROUP BY hire_year;
   ```
 
-  This returns one row per year with the number of people hired that year.
+  Получится по одной строке на каждый год с количеством сотрудников, нанятых в этот год.
 
-  Rule: every column in `SELECT` must be either in `GROUP BY` or inside an aggregate function.
+  Правило: каждый столбец в `SELECT` должен быть либо в `GROUP BY`, либо внутри агрегатной функции.
 task: |
-  For each `department_id`, show the department id and the **average salary** of its employees.
-  (Employees without a department form their own group — that's fine.)
+  Для каждого `department_id` покажи номер отдела и **среднюю зарплату** его сотрудников.
+  (Сотрудники без отдела попадут в отдельную группу, это нормально.)
 hint: |
   `SELECT department_id, AVG(salary) FROM employees GROUP BY department_id;`
 starter: |

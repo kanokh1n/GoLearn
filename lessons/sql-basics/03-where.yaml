@@ -1,16 +1,16 @@
-title: Filtering with WHERE
+title: Фильтрация через WHERE
 type: sql
 xp: 10
 theory: |
-  `WHERE` keeps only the rows that match a condition:
+  `WHERE` оставляет только строки, которые подходят под условие:
 
   ```sql
   SELECT * FROM departments WHERE city = 'Moscow';
   ```
 
-  Operators: `=`, `<>` (not equal), `<`, `>`, `<=`, `>=`. Text values go in **single quotes**.
+  Операторы: `=`, `<>` (не равно), `<`, `>`, `<=`, `>=`. Текстовые значения пишутся в **одинарных кавычках**.
 task: |
-  Find the `name` and `salary` of employees who earn **more than 200000**.
+  Найди `name` и `salary` сотрудников, которые получают **больше 200000**.
 hint: |
   `WHERE salary > 200000`
 starter: |

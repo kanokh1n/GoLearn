@@ -82,7 +82,7 @@ func goCmd(ctx context.Context, dir string, args ...string) (GoResult, error) {
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		res.TimedOut = true
 		res.ExitCode = -1
-		res.Output += fmt.Sprintf("\n[timed out after %s]", GoTimeout)
+		res.Output += fmt.Sprintf("\n[превышено время выполнения: %s]", GoTimeout)
 		return res, nil
 	}
 	var exitErr *exec.ExitError

@@ -1,20 +1,20 @@
-title: Choosing Columns
+title: Выбор столбцов
 type: sql
 xp: 10
 theory: |
-  Instead of `*` you can list the columns you need, separated by commas:
+  Вместо `*` можно перечислить нужные столбцы через запятую:
 
   ```sql
   SELECT name, city FROM departments;
   ```
 
-  You can also rename a column in the result with `AS`:
+  Столбец в результате можно переименовать через `AS`:
 
   ```sql
   SELECT name AS department FROM departments;
   ```
 task: |
-  Select only the `name` and `salary` of every employee.
+  Выбери только `name` и `salary` каждого сотрудника.
 hint: |
   `SELECT name, salary FROM ...`
 starter: |

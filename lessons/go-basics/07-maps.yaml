@@ -1,26 +1,26 @@
-title: Maps
+title: Мапы
 type: go
 xp: 15
 theory: |
-  A **map** stores key → value pairs:
+  **Мапа** (map) хранит пары ключ → значение:
 
   ```go
   ages := map[string]int{"Anna": 25}
-  ages["Ivan"] = 30          // add or update
+  ages["Ivan"] = 30          // добавить или обновить
   fmt.Println(ages["Anna"])  // 25
   delete(ages, "Ivan")
 
-  age, ok := ages["Petr"]    // ok is false if the key is missing
+  age, ok := ages["Petr"]    // ok == false, если ключа нет
   ```
 
-  A missing key returns the **zero value** (0 for int), so `counts[word]++` just works.
+  Для отсутствующего ключа возвращается **нулевое значение** (0 для int), поэтому `counts[word]++` просто работает.
 task: |
-  Write `WordCount(text string) map[string]int` that counts how many times each word appears.
-  Words are separated by spaces; treat upper and lower case as the same word.
+  Напиши `WordCount(text string) map[string]int`, которая считает, сколько раз встречается каждое слово.
+  Слова разделены пробелами; заглавные и строчные буквы считаются одинаковыми.
 
-  Example: `WordCount("Go is fun go")` returns `map[fun:1 go:2 is:1]`.
+  Пример: `WordCount("Go is fun go")` возвращает `map[fun:1 go:2 is:1]`.
 hint: |
-  Use `strings.Fields(text)` to split into words and `strings.ToLower(word)` to normalize. Don't forget to import `strings`.
+  `strings.Fields(text)` разбивает текст на слова, а `strings.ToLower(word)` приводит слово к нижнему регистру. Не забудь импортировать `strings`.
 starter: |
   package main
 
@@ -29,7 +29,7 @@ starter: |
   )
 
   func WordCount(text string) map[string]int {
-  	// your code here
+  	// твой код здесь
   	return nil
   }
 

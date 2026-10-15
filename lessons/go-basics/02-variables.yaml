@@ -1,24 +1,24 @@
-title: Variables
+title: Переменные
 type: go
 xp: 10
 theory: |
-  A variable stores a value. Go has two common ways to declare one:
+  Переменная хранит значение. В Go есть два основных способа её объявить:
 
   ```go
-  var age int = 25   // full form
-  name := "Anna"     // short form: the type is inferred
+  var age int = 25   // полная форма
+  name := "Anna"     // краткая форма: тип выводится сам
   ```
 
-  The short form `:=` works only inside functions.
+  Краткая форма `:=` работает только внутри функций.
 
-  `fmt.Println` can print several values separated by spaces:
+  `fmt.Println` может вывести несколько значений через пробел:
 
   ```go
   fmt.Println(name, "is", age) // Anna is 25
   ```
 task: |
-  Create a variable `language` with the value `"Go"` and a variable `year` with the value `2009`.
-  Print them so the output is:
+  Создай переменную `language` со значением `"Go"` и переменную `year` со значением `2009`.
+  Выведи их так, чтобы получилось:
 
   ```
   Go was created in 2009
@@ -31,9 +31,9 @@ starter: |
   import "fmt"
 
   func main() {
-  	// declare language and year
+  	// объяви language и year
 
-  	// print them
+  	// выведи их
   }
 expected_output: |
   Go was created in 2009

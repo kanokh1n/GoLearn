@@ -1,24 +1,24 @@
-title: ORDER BY and LIMIT
+title: ORDER BY и LIMIT
 type: sql
 xp: 15
 ordered: true
 theory: |
-  Rows come back in no particular order unless you sort them:
+  Без сортировки строки возвращаются в произвольном порядке:
 
   ```sql
-  SELECT name, salary FROM employees ORDER BY salary;       -- ascending
-  SELECT name, salary FROM employees ORDER BY salary DESC;  -- descending
+  SELECT name, salary FROM employees ORDER BY salary;       -- по возрастанию
+  SELECT name, salary FROM employees ORDER BY salary DESC;  -- по убыванию
   ```
 
-  `LIMIT n` keeps only the first `n` rows:
+  `LIMIT n` оставляет только первые `n` строк:
 
   ```sql
-  SELECT name FROM employees ORDER BY hire_year LIMIT 1;  -- the first hire
+  SELECT name FROM employees ORDER BY hire_year LIMIT 1;  -- самый первый сотрудник
   ```
 
-  **In this lesson the order of rows matters.**
+  **В этом уроке порядок строк важен.**
 task: |
-  Show the `name` and `salary` of the **3 best-paid** employees, from highest to lowest salary.
+  Покажи `name` и `salary` **трёх самых высокооплачиваемых** сотрудников, от большей зарплаты к меньшей.
 hint: |
   `ORDER BY salary DESC LIMIT 3`
 starter: |

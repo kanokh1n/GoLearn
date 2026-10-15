@@ -1,13 +1,14 @@
 # GoLearn
 
 An interactive trainer for backend skills, in the spirit of SQL Academy and Codédex.
+Lesson texts and the interface are in Russian, so it can be used for mentoring Russian-speaking students.
 Every lesson has a short theory section and a task. You write the solution in the
 built-in editor, press **Check**, and get the result right away.
 
 Tracks right now:
 
-- **Go Basics**: 10 lessons, from Hello World to errors. Code runs with `go run` / `go test`.
-- **SQL Basics**: 12 lessons, from `SELECT` to `JOIN` and subqueries. Queries run in SQLite and are compared with a reference query.
+- **Go Basics (Основы Go)**: 10 lessons, from Hello World to errors. Code runs with `go run` / `go test`.
+- **SQL Basics (Основы SQL)**: 12 lessons, from `SELECT` to `JOIN` and subqueries. Queries run in SQLite and are compared with a reference query.
 
 Progress, XP and your code drafts are saved in `data/progress.json`.
 
