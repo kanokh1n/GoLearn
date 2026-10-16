@@ -1,0 +1,149 @@
+title: Пайплайн из каналов
+type: go
+xp: 25
+theory: |
+  Каналы удобно соединять в **пайплайн**: каждая стадия читает из одного канала и пишет в другой.
+
+  ```go
+  func Double(in <-chan int) <-chan int {
+  	out := make(chan int)
+  	go func() {
+  		defer close(out)       // закрываем выход, когда вход кончился
+  		for v := range in {
+  			out <- v * 2
+  		}
+  	}()
+  	return out
+  }
+
+  for v := range Double(Generate(3)) { // 2, 4, 6
+  	fmt.Println(v)
+  }
+  ```
+
+  Так устроены многие обработчики данных: чтение → преобразование → запись.
+task: |
+  Напиши две стадии пайплайна:
+
+  - `Square(in <-chan int) <-chan int` — возводит каждое число в квадрат;
+  - `FilterEven(in <-chan int) <-chan int` — пропускает только чётные числа.
+
+  Обе должны закрывать свой выходной канал, когда закончился входной. Функция `Generate` уже есть.
+hint: |
+  Шаблон стадии: создать `out`, запустить горутину с `defer close(out)` и циклом `for v := range in`, вернуть `out`.
+starter: |
+  package main
+
+  import "fmt"
+
+  func Generate(n int) <-chan int {
+  	ch := make(chan int)
+  	go func() {
+  		defer close(ch)
+  		for i := 1; i <= n; i++ {
+  			ch <- i
+  		}
+  	}()
+  	return ch
+  }
+
+  func Square(in <-chan int) <-chan int {
+  	// твой код здесь
+  	return nil
+  }
+
+  func FilterEven(in <-chan int) <-chan int {
+  	// твой код здесь
+  	return nil
+  }
+
+  func main() {
+  	for v := range FilterEven(Square(Generate(6))) {
+  		fmt.Println(v) // 4, 16, 36
+  	}
+  }
+tests: |
+  package main
+
+  import (
+  	"slices"
+  	"testing"
+  	"time"
+  )
+
+  func collect(t *testing.T, ch <-chan int) []int {
+  	t.Helper()
+  	if ch == nil {
+  		t.Fatal("стадия вернула nil вместо канала")
+  	}
+  	var got []int
+  	timeout := time.After(time.Second)
+  	for {
+  		select {
+  		case v, ok := <-ch:
+  			if !ok {
+  				return got
+  			}
+  			got = append(got, v)
+  		case <-timeout:
+  			t.Fatalf("выходной канал не закрыт (прочитали %v)", got)
+  		}
+  	}
+  }
+
+  func TestSquare(t *testing.T) {
+  	if got := collect(t, Square(Generate(4))); !slices.Equal(got, []int{1, 4, 9, 16}) {
+  		t.Errorf("Square(1..4) = %v, ожидали [1 4 9 16]", got)
+  	}
+  }
+
+  func TestFilterEven(t *testing.T) {
+  	if got := collect(t, FilterEven(Generate(7))); !slices.Equal(got, []int{2, 4, 6}) {
+  		t.Errorf("FilterEven(1..7) = %v, ожидали [2 4 6]", got)
+  	}
+  }
+
+  func TestPipeline(t *testing.T) {
+  	if got := collect(t, FilterEven(Square(Generate(6)))); !slices.Equal(got, []int{4, 16, 36}) {
+  		t.Errorf("FilterEven(Square(1..6)) = %v, ожидали [4 16 36]", got)
+  	}
+  }
+solution: |
+  package main
+
+  func Generate(n int) <-chan int {
+  	ch := make(chan int)
+  	go func() {
+  		defer close(ch)
+  		for i := 1; i <= n; i++ {
+  			ch <- i
+  		}
+  	}()
+  	return ch
+  }
+
+  func Square(in <-chan int) <-chan int {
+  	out := make(chan int)
+  	go func() {
+  		defer close(out)
+  		for v := range in {
+  			out <- v * v
+  		}
+  	}()
+  	return out
+  }
+
+  func FilterEven(in <-chan int) <-chan int {
+  	out := make(chan int)
+  	go func() {
+  		defer close(out)
+  		for v := range in {
+  			if v%2 == 0 {
+  				out <- v
+  			}
+  		}
+  	}()
+  	return out
+  }
+
+  func main() {}

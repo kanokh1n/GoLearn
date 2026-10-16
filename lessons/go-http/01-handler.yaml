@@ -1,0 +1,72 @@
+title: Первый хендлер
+type: go
+xp: 15
+theory: |
+  HTTP-сервер в Go пишется на стандартной библиотеке `net/http`, без фреймворков. Главное понятие — **хендлер**: функция, которая получает запрос и пишет ответ.
+
+  ```go
+  func hello(w http.ResponseWriter, r *http.Request) {
+  	fmt.Fprint(w, "Hi!")   // тело ответа
+  }
+
+  func main() {
+  	http.HandleFunc("/hello", hello)
+  	http.ListenAndServe(":8080", nil)
+  }
+  ```
+
+  - `r` — входящий запрос: метод, URL, заголовки, тело.
+  - `w` — куда писать ответ. По умолчанию статус `200 OK`.
+
+  В этих уроках сервер не запускается: тесты вызывают хендлер напрямую через `httptest`, так же проверяют хендлеры в настоящих проектах.
+task: |
+  Напиши хендлер `helloHandler`, который отвечает текстом `Hello, GoLearn!` и статусом 200.
+hint: |
+  `fmt.Fprint(w, "Hello, GoLearn!")`
+starter: |
+  package main
+
+  import (
+  	"net/http"
+  )
+
+  func helloHandler(w http.ResponseWriter, r *http.Request) {
+  	// твой код здесь
+  }
+
+  func main() {
+  	http.HandleFunc("/hello", helloHandler)
+  	// http.ListenAndServe(":8080", nil) — в уроке сервер не запускаем
+  }
+tests: |
+  package main
+
+  import (
+  	"net/http"
+  	"net/http/httptest"
+  	"testing"
+  )
+
+  func TestHello(t *testing.T) {
+  	rec := httptest.NewRecorder()
+  	helloHandler(rec, httptest.NewRequest(http.MethodGet, "/hello", nil))
+  	if rec.Code != http.StatusOK {
+  		t.Fatalf("статус %d, ожидали 200", rec.Code)
+  	}
+  	if got := rec.Body.String(); got != "Hello, GoLearn!" {
+  		t.Fatalf("тело ответа %q, ожидали %q", got, "Hello, GoLearn!")
+  	}
+  }
+solution: |
+  package main
+
+  import (
+  	"fmt"
+  	"net/http"
+  )
+
+  func helloHandler(w http.ResponseWriter, r *http.Request) {
+  	fmt.Fprint(w, "Hello, GoLearn!")
+  }
+
+  func main() {}

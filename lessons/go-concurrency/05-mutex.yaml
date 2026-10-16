@@ -1,0 +1,109 @@
+title: Mutex и гонки данных
+type: go
+xp: 25
+theory: |
+  Если несколько горутин одновременно меняют одну переменную, получается **гонка данных** (data race): часть изменений теряется.
+
+  ```go
+  count := 0
+  for i := 0; i < 1000; i++ {
+  	go func() { count++ }() // ❌ гонка: итог будет меньше 1000
+  }
+  ```
+
+  **`sync.Mutex`** пускает к данным только одну горутину за раз:
+
+  ```go
+  type SafeMap struct {
+  	mu sync.Mutex
+  	m  map[string]int
+  }
+
+  func (s *SafeMap) Inc(key string) {
+  	s.mu.Lock()
+  	defer s.mu.Unlock()
+  	s.m[key]++
+  }
+  ```
+
+  Гонки ищет детектор: `go test -race` или `go run -race`.
+task: |
+  Сделай тип `Counter`, безопасный для использования из многих горутин:
+
+  - `Inc()` увеличивает счётчик на 1;
+  - `Value() int` возвращает текущее значение.
+
+  Тест запускает 100 горутин, каждая вызывает `Inc()` 1000 раз, и ждёт ровно 100000.
+hint: |
+  Добавь в структуру поле `mu sync.Mutex`. В обоих методах: `c.mu.Lock()`, `defer c.mu.Unlock()`. Методы с получателем-указателем `*Counter`.
+starter: |
+  package main
+
+  import "fmt"
+
+  type Counter struct {
+  	n int
+  }
+
+  func (c *Counter) Inc() {
+  	// твой код здесь
+  }
+
+  func (c *Counter) Value() int {
+  	// твой код здесь
+  	return 0
+  }
+
+  func main() {
+  	c := &Counter{}
+  	c.Inc()
+  	fmt.Println(c.Value())
+  }
+tests: |
+  package main
+
+  import (
+  	"sync"
+  	"testing"
+  )
+
+  func TestCounter(t *testing.T) {
+  	c := &Counter{}
+  	var wg sync.WaitGroup
+  	for i := 0; i < 100; i++ {
+  		wg.Add(1)
+  		go func() {
+  			defer wg.Done()
+  			for j := 0; j < 1000; j++ {
+  				c.Inc()
+  			}
+  		}()
+  	}
+  	wg.Wait()
+  	if got := c.Value(); got != 100000 {
+  		t.Fatalf("Value() = %d, ожидали 100000. Похоже, есть гонка данных", got)
+  	}
+  }
+solution: |
+  package main
+
+  import "sync"
+
+  type Counter struct {
+  	mu sync.Mutex
+  	n  int
+  }
+
+  func (c *Counter) Inc() {
+  	c.mu.Lock()
+  	defer c.mu.Unlock()
+  	c.n++
+  }
+
+  func (c *Counter) Value() int {
+  	c.mu.Lock()
+  	defer c.mu.Unlock()
+  	return c.n
+  }
+
+  func main() {}

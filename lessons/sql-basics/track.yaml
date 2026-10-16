@@ -1,6 +1,6 @@
 title: Основы SQL
 description: Пишем запросы к небольшой базе компании, от SELECT до JOIN и подзапросов.
-order: 2
+order: 4
 setup: |
   CREATE TABLE departments (
     id   INTEGER PRIMARY KEY,

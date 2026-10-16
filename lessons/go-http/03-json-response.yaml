@@ -1,0 +1,92 @@
+title: JSON-ответ
+type: go
+xp: 20
+theory: |
+  API обычно отвечает в **JSON**. Структура превращается в JSON через `encoding/json`, а **теги** задают имена полей:
+
+  ```go
+  type User struct {
+  	ID    int    `json:"id"`
+  	Name  string `json:"name"`
+  	Email string `json:"email,omitempty"` // не выводить, если пусто
+  }
+
+  w.Header().Set("Content-Type", "application/json")
+  json.NewEncoder(w).Encode(User{ID: 1, Name: "Anna"})
+  // {"id":1,"name":"Anna"}
+  ```
+
+  Поля должны начинаться с заглавной буквы, иначе `json` их не увидит.
+task: |
+  Напиши `userHandler`, который отвечает JSON-объектом
+
+  ```json
+  {"id": 1, "name": "Anna", "role": "admin"}
+  ```
+
+  с заголовком `Content-Type: application/json`. Структура `User` уже начата.
+hint: |
+  Добавь в `User` поля `Name` и `Role` с тегами `json:"name"` и `json:"role"`. В хендлере установи заголовок и вызови `json.NewEncoder(w).Encode(...)`.
+starter: |
+  package main
+
+  import (
+  	"encoding/json"
+  	"net/http"
+  )
+
+  type User struct {
+  	ID int `json:"id"`
+  	// добавь поля
+  }
+
+  func userHandler(w http.ResponseWriter, r *http.Request) {
+  	// твой код здесь
+  	_ = json.NewEncoder
+  }
+
+  func main() {}
+tests: |
+  package main
+
+  import (
+  	"encoding/json"
+  	"net/http"
+  	"net/http/httptest"
+  	"testing"
+  )
+
+  func TestUserHandler(t *testing.T) {
+  	rec := httptest.NewRecorder()
+  	userHandler(rec, httptest.NewRequest(http.MethodGet, "/user", nil))
+  	if ct := rec.Header().Get("Content-Type"); ct != "application/json" {
+  		t.Errorf("Content-Type = %q, ожидали application/json", ct)
+  	}
+  	var got map[string]any
+  	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+  		t.Fatalf("ответ не JSON: %v (тело %q)", err, rec.Body.String())
+  	}
+  	if got["id"] != float64(1) || got["name"] != "Anna" || got["role"] != "admin" {
+  		t.Fatalf("получили %v, ожидали id=1 name=Anna role=admin", got)
+  	}
+  }
+solution: |
+  package main
+
+  import (
+  	"encoding/json"
+  	"net/http"
+  )
+
+  type User struct {
+  	ID   int    `json:"id"`
+  	Name string `json:"name"`
+  	Role string `json:"role"`
+  }
+
+  func userHandler(w http.ResponseWriter, r *http.Request) {
+  	w.Header().Set("Content-Type", "application/json")
+  	json.NewEncoder(w).Encode(User{ID: 1, Name: "Anna", Role: "admin"})
+  }
+
+  func main() {}

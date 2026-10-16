@@ -1,0 +1,98 @@
+title: Middleware
+type: go
+xp: 25
+theory: |
+  **Middleware** — функция, которая оборачивает хендлер и добавляет общее поведение: логирование, авторизацию, recover от паник.
+
+  ```go
+  func logging(next http.Handler) http.Handler {
+  	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+  		start := time.Now()
+  		next.ServeHTTP(w, r)            // вызвать обёрнутый хендлер
+  		log.Println(r.Method, r.URL.Path, time.Since(start))
+  	})
+  }
+
+  handler := logging(mux)
+  ```
+
+  Если middleware не вызывает `next.ServeHTTP`, запрос дальше не идёт. Так работает проверка доступа.
+task: |
+  Напиши middleware `requireAPIKey(next http.Handler) http.Handler`:
+
+  - если в заголовке `X-API-Key` значение `secret` — передай запрос дальше;
+  - иначе ответь **401** с текстом `unauthorized` и **не** вызывай `next`.
+hint: |
+  `if r.Header.Get("X-API-Key") != "secret" { http.Error(w, "unauthorized", http.StatusUnauthorized); return }`, затем `next.ServeHTTP(w, r)`.
+starter: |
+  package main
+
+  import (
+  	"net/http"
+  )
+
+  func requireAPIKey(next http.Handler) http.Handler {
+  	// твой код здесь
+  	return next
+  }
+
+  func main() {}
+tests: |
+  package main
+
+  import (
+  	"fmt"
+  	"net/http"
+  	"net/http/httptest"
+  	"strings"
+  	"testing"
+  )
+
+  func TestRequireAPIKey(t *testing.T) {
+  	called := false
+  	inner := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+  		called = true
+  		fmt.Fprint(w, "secret data")
+  	})
+  	h := requireAPIKey(inner)
+
+  	for _, key := range []string{"", "wrong"} {
+  		called = false
+  		rec := httptest.NewRecorder()
+  		req := httptest.NewRequest("GET", "/data", nil)
+  		if key != "" {
+  			req.Header.Set("X-API-Key", key)
+  		}
+  		h.ServeHTTP(rec, req)
+  		if rec.Code != 401 || strings.TrimSpace(rec.Body.String()) != "unauthorized" {
+  			t.Errorf("ключ %q: %d %q, ожидали 401 \"unauthorized\"", key, rec.Code, rec.Body.String())
+  		}
+  		if called {
+  			t.Errorf("ключ %q: внутренний хендлер вызван без доступа", key)
+  		}
+  	}
+
+  	rec := httptest.NewRecorder()
+  	req := httptest.NewRequest("GET", "/data", nil)
+  	req.Header.Set("X-API-Key", "secret")
+  	h.ServeHTTP(rec, req)
+  	if rec.Code != 200 || rec.Body.String() != "secret data" {
+  		t.Errorf("правильный ключ: %d %q, ожидали 200 \"secret data\"", rec.Code, rec.Body.String())
+  	}
+  }
+solution: |
+  package main
+
+  import "net/http"
+
+  func requireAPIKey(next http.Handler) http.Handler {
+  	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+  		if r.Header.Get("X-API-Key") != "secret" {
+  			http.Error(w, "unauthorized", http.StatusUnauthorized)
+  			return
+  		}
+  		next.ServeHTTP(w, r)
+  	})
+  }
+
+  func main() {}

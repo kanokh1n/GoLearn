@@ -1,0 +1,90 @@
+title: Роутинг с ServeMux
+type: go
+xp: 25
+theory: |
+  С Go 1.22 стандартный роутер `http.ServeMux` умеет методы и параметры пути, и сторонние роутеры часто не нужны:
+
+  ```go
+  mux := http.NewServeMux()
+  mux.HandleFunc("GET /users/{id}", func(w http.ResponseWriter, r *http.Request) {
+  	id := r.PathValue("id")   // значение из пути
+  	fmt.Fprintf(w, "user %s", id)
+  })
+  mux.HandleFunc("POST /users", createUser)
+
+  http.ListenAndServe(":8080", mux)
+  ```
+
+  На запрос с другим методом mux сам ответит **405**, а на неизвестный путь — **404**.
+task: |
+  Напиши `newMux() *http.ServeMux` с двумя маршрутами:
+
+  - `GET /health` → текст `ok`;
+  - `GET /tasks/{id}` → текст `task <id>` (например, `GET /tasks/42` → `task 42`).
+hint: |
+  `mux.HandleFunc("GET /health", ...)` и `mux.HandleFunc("GET /tasks/{id}", ...)`, внутри второго `r.PathValue("id")`.
+starter: |
+  package main
+
+  import (
+  	"net/http"
+  )
+
+  func newMux() *http.ServeMux {
+  	mux := http.NewServeMux()
+  	// твои маршруты
+  	return mux
+  }
+
+  func main() {}
+tests: |
+  package main
+
+  import (
+  	"net/http/httptest"
+  	"strings"
+  	"testing"
+  )
+
+  func TestRoutes(t *testing.T) {
+  	mux := newMux()
+  	cases := []struct {
+  		method, path string
+  		wantCode     int
+  		wantBody     string
+  	}{
+  		{"GET", "/health", 200, "ok"},
+  		{"GET", "/tasks/42", 200, "task 42"},
+  		{"GET", "/tasks/abc", 200, "task abc"},
+  		{"POST", "/tasks/42", 405, ""},
+  		{"GET", "/unknown", 404, ""},
+  	}
+  	for _, c := range cases {
+  		rec := httptest.NewRecorder()
+  		mux.ServeHTTP(rec, httptest.NewRequest(c.method, c.path, nil))
+  		body := strings.TrimSpace(rec.Body.String())
+  		if rec.Code != c.wantCode || (c.wantBody != "" && body != c.wantBody) {
+  			t.Errorf("%s %s → %d %q, ожидали %d %q", c.method, c.path, rec.Code, body, c.wantCode, c.wantBody)
+  		}
+  	}
+  }
+solution: |
+  package main
+
+  import (
+  	"fmt"
+  	"net/http"
+  )
+
+  func newMux() *http.ServeMux {
+  	mux := http.NewServeMux()
+  	mux.HandleFunc("GET /health", func(w http.ResponseWriter, r *http.Request) {
+  		fmt.Fprint(w, "ok")
+  	})
+  	mux.HandleFunc("GET /tasks/{id}", func(w http.ResponseWriter, r *http.Request) {
+  		fmt.Fprintf(w, "task %s", r.PathValue("id"))
+  	})
+  	return mux
+  }
+
+  func main() {}

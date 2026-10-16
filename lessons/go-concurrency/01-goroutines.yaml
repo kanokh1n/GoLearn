@@ -1,0 +1,101 @@
+title: Горутины и WaitGroup
+type: go
+xp: 20
+theory: |
+  **Горутина** — лёгкий поток выполнения. Чтобы запустить функцию в горутине, достаточно написать `go` перед вызовом:
+
+  ```go
+  go doWork()   // doWork выполняется параллельно, main не ждёт
+  ```
+
+  Программа не ждёт горутины сама. Чтобы дождаться, используют **`sync.WaitGroup`**:
+
+  ```go
+  var wg sync.WaitGroup
+  for i := 0; i < 3; i++ {
+  	wg.Add(1)          // +1 к счётчику до запуска горутины
+  	go func() {
+  		defer wg.Done() // -1 по завершении
+  		fmt.Println("worker", i)
+  	}()
+  }
+  wg.Wait()              // ждём, пока счётчик станет 0
+  ```
+
+  С Go 1.22 переменная цикла `i` своя на каждой итерации, поэтому её можно спокойно использовать в горутине.
+task: |
+  Напиши `RunAll(tasks []func())`, которая запускает **все задачи параллельно** и возвращается только когда **все** они завершились.
+
+  Тест запускает 10 задач по 100 мс каждая. Последовательно это 1 секунда, а параллельно должно уложиться в 500 мс.
+hint: |
+  Для каждой задачи: `wg.Add(1)` и `go func() { defer wg.Done(); task() }()`. После цикла `wg.Wait()`.
+starter: |
+  package main
+
+  import (
+  	"fmt"
+  	"time"
+  )
+
+  func RunAll(tasks []func()) {
+  	// сейчас задачи выполняются по очереди, сделай их параллельными
+  	for _, task := range tasks {
+  		task()
+  	}
+  }
+
+  func main() {
+  	start := time.Now()
+  	tasks := make([]func(), 5)
+  	for i := range tasks {
+  		tasks[i] = func() { time.Sleep(100 * time.Millisecond) }
+  	}
+  	RunAll(tasks)
+  	fmt.Println("done in", time.Since(start).Round(10*time.Millisecond))
+  }
+tests: |
+  package main
+
+  import (
+  	"sync/atomic"
+  	"testing"
+  	"time"
+  )
+
+  func TestRunAll(t *testing.T) {
+  	var done atomic.Int32
+  	tasks := make([]func(), 10)
+  	for i := range tasks {
+  		tasks[i] = func() {
+  			time.Sleep(100 * time.Millisecond)
+  			done.Add(1)
+  		}
+  	}
+  	start := time.Now()
+  	RunAll(tasks)
+  	elapsed := time.Since(start)
+  	if got := done.Load(); got != 10 {
+  		t.Fatalf("RunAll вернулась, когда завершилось %d задач из 10", got)
+  	}
+  	if elapsed > 500*time.Millisecond {
+  		t.Fatalf("RunAll заняла %v — задачи выполняются не параллельно", elapsed)
+  	}
+  }
+solution: |
+  package main
+
+  import "sync"
+
+  func RunAll(tasks []func()) {
+  	var wg sync.WaitGroup
+  	for _, task := range tasks {
+  		wg.Add(1)
+  		go func() {
+  			defer wg.Done()
+  			task()
+  		}()
+  	}
+  	wg.Wait()
+  }
+
+  func main() {}

@@ -1,0 +1,94 @@
+title: Каналы
+type: go
+xp: 20
+theory: |
+  **Канал** — труба, через которую горутины передают друг другу значения:
+
+  ```go
+  ch := make(chan int)   // небуферизированный канал
+  go func() {
+  	ch <- 42           // отправить (ждёт, пока кто-то примет)
+  }()
+  v := <-ch              // принять
+  ```
+
+  Отправитель может **закрыть** канал: `close(ch)`. Тогда получатель через `range` дочитает всё и выйдет из цикла:
+
+  ```go
+  for v := range ch {
+  	fmt.Println(v)
+  }
+  ```
+
+  Типы `<-chan int` (только чтение) и `chan<- int` (только запись) защищают от ошибок.
+task: |
+  Напиши `Generate(n int) <-chan int`, которая возвращает канал и **в отдельной горутине** отправляет в него числа от 1 до `n`, после чего **закрывает** канал.
+
+  Пример: `for v := range Generate(3)` выведет 1, 2, 3.
+hint: |
+  `ch := make(chan int)`, затем `go func() { for i := 1; i <= n; i++ { ch <- i }; close(ch) }()` и `return ch`.
+starter: |
+  package main
+
+  import "fmt"
+
+  func Generate(n int) <-chan int {
+  	// твой код здесь
+  	return nil
+  }
+
+  func main() {
+  	for v := range Generate(5) {
+  		fmt.Println(v)
+  	}
+  }
+tests: |
+  package main
+
+  import (
+  	"testing"
+  	"time"
+  )
+
+  func TestGenerate(t *testing.T) {
+  	ch := Generate(5)
+  	if ch == nil {
+  		t.Fatal("Generate вернула nil вместо канала")
+  	}
+  	var got []int
+  	timeout := time.After(time.Second)
+  	for {
+  		select {
+  		case v, ok := <-ch:
+  			if !ok {
+  				for i, want := range []int{1, 2, 3, 4, 5} {
+  					if i >= len(got) || got[i] != want {
+  						t.Fatalf("получили %v, ожидали [1 2 3 4 5]", got)
+  					}
+  				}
+  				if len(got) != 5 {
+  					t.Fatalf("получили %v, ожидали [1 2 3 4 5]", got)
+  				}
+  				return
+  			}
+  			got = append(got, v)
+  		case <-timeout:
+  			t.Fatalf("канал не закрыт: прочитали %v и ждём дальше. Не забудь close(ch)", got)
+  		}
+  	}
+  }
+solution: |
+  package main
+
+  func Generate(n int) <-chan int {
+  	ch := make(chan int)
+  	go func() {
+  		for i := 1; i <= n; i++ {
+  			ch <- i
+  		}
+  		close(ch)
+  	}()
+  	return ch
+  }
+
+  func main() {}

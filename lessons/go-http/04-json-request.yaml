@@ -1,0 +1,115 @@
+title: JSON-запрос и методы
+type: go
+xp: 25
+theory: |
+  Тело запроса читается из `r.Body`. JSON декодируется в структуру:
+
+  ```go
+  var req struct {
+  	Numbers []int `json:"numbers"`
+  }
+  if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+  	http.Error(w, "invalid json", http.StatusBadRequest)
+  	return
+  }
+  ```
+
+  Метод запроса — `r.Method`. Если хендлер принимает только POST, на остальные отвечают **405**:
+
+  ```go
+  if r.Method != http.MethodPost {
+  	http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+  	return
+  }
+  ```
+task: |
+  Напиши `sumHandler`:
+
+  - `POST` с телом `{"numbers": [1, 2, 3]}` → JSON `{"sum": 6}` и `Content-Type: application/json`;
+  - некорректный JSON → **400**;
+  - любой метод, кроме POST → **405**.
+hint: |
+  Сначала проверь метод, потом декодируй тело, посчитай сумму в цикле и закодируй `map[string]int{"sum": total}` или структуру с тегом `json:"sum"`.
+starter: |
+  package main
+
+  import (
+  	"net/http"
+  )
+
+  func sumHandler(w http.ResponseWriter, r *http.Request) {
+  	// твой код здесь
+  }
+
+  func main() {}
+tests: |
+  package main
+
+  import (
+  	"encoding/json"
+  	"net/http"
+  	"net/http/httptest"
+  	"strings"
+  	"testing"
+  )
+
+  func call(method, body string) *httptest.ResponseRecorder {
+  	rec := httptest.NewRecorder()
+  	sumHandler(rec, httptest.NewRequest(method, "/sum", strings.NewReader(body)))
+  	return rec
+  }
+
+  func TestSum(t *testing.T) {
+  	rec := call(http.MethodPost, `{"numbers": [1, 2, 3, 10]}`)
+  	if rec.Code != 200 {
+  		t.Fatalf("POST: статус %d, ожидали 200 (тело %q)", rec.Code, rec.Body.String())
+  	}
+  	var got struct{ Sum *int `json:"sum"` }
+  	if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil || got.Sum == nil || *got.Sum != 16 {
+  		t.Fatalf("тело %q, ожидали {\"sum\":16}", rec.Body.String())
+  	}
+  	if ct := rec.Header().Get("Content-Type"); ct != "application/json" {
+  		t.Errorf("Content-Type = %q, ожидали application/json", ct)
+  	}
+  }
+
+  func TestSumBadJSON(t *testing.T) {
+  	if rec := call(http.MethodPost, `{"numbers": [1, 2`); rec.Code != 400 {
+  		t.Fatalf("некорректный JSON: статус %d, ожидали 400", rec.Code)
+  	}
+  }
+
+  func TestSumWrongMethod(t *testing.T) {
+  	if rec := call(http.MethodGet, ""); rec.Code != 405 {
+  		t.Fatalf("GET: статус %d, ожидали 405", rec.Code)
+  	}
+  }
+solution: |
+  package main
+
+  import (
+  	"encoding/json"
+  	"net/http"
+  )
+
+  func sumHandler(w http.ResponseWriter, r *http.Request) {
+  	if r.Method != http.MethodPost {
+  		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+  		return
+  	}
+  	var req struct {
+  		Numbers []int `json:"numbers"`
+  	}
+  	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+  		http.Error(w, "invalid json", http.StatusBadRequest)
+  		return
+  	}
+  	total := 0
+  	for _, n := range req.Numbers {
+  		total += n
+  	}
+  	w.Header().Set("Content-Type", "application/json")
+  	json.NewEncoder(w).Encode(map[string]int{"sum": total})
+  }
+
+  func main() {}

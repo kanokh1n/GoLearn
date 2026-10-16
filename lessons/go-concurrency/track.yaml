@@ -1,0 +1,3 @@
+title: "Go: конкурентность"
+description: Горутины, каналы, select, sync и context — то, за что Go любят на бэкенде.
+order: 2

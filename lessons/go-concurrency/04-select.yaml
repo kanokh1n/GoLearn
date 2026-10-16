@@ -1,0 +1,96 @@
+title: select и таймауты
+type: go
+xp: 25
+theory: |
+  `select` ждёт сразу несколько каналов и выполняет ту ветку, которая готова первой:
+
+  ```go
+  select {
+  case v := <-results:
+  	fmt.Println("got", v)
+  case <-time.After(2 * time.Second):
+  	fmt.Println("timeout")
+  }
+  ```
+
+  `time.After(d)` возвращает канал, в который придёт значение через `d`. Это стандартный способ сделать **таймаут**.
+
+  Если горутина может остаться висеть после таймаута, делай канал буферизированным (`make(chan string, 1)`), чтобы отправка не блокировалась навсегда.
+task: |
+  Напиши `FetchWithTimeout(fetch func() string, timeout time.Duration) (string, error)`:
+
+  - запусти `fetch` в горутине;
+  - если результат пришёл раньше `timeout`, верни его и `nil`;
+  - иначе верни `""` и ошибку `ErrTimeout` (она уже объявлена).
+hint: |
+  `ch := make(chan string, 1)`, `go func() { ch <- fetch() }()`, затем `select` с веткой `case <-time.After(timeout): return "", ErrTimeout`.
+starter: |
+  package main
+
+  import (
+  	"errors"
+  	"fmt"
+  	"time"
+  )
+
+  var ErrTimeout = errors.New("timeout")
+
+  func FetchWithTimeout(fetch func() string, timeout time.Duration) (string, error) {
+  	// твой код здесь
+  	return "", nil
+  }
+
+  func main() {
+  	slow := func() string { time.Sleep(time.Second); return "data" }
+  	fmt.Println(FetchWithTimeout(slow, 100*time.Millisecond))
+  }
+tests: |
+  package main
+
+  import (
+  	"errors"
+  	"testing"
+  	"time"
+  )
+
+  func TestFast(t *testing.T) {
+  	fast := func() string { time.Sleep(10 * time.Millisecond); return "data" }
+  	got, err := FetchWithTimeout(fast, 500*time.Millisecond)
+  	if err != nil || got != "data" {
+  		t.Fatalf("быстрый fetch: получили %q, %v; ожидали \"data\", nil", got, err)
+  	}
+  }
+
+  func TestSlow(t *testing.T) {
+  	slow := func() string { time.Sleep(2 * time.Second); return "data" }
+  	start := time.Now()
+  	got, err := FetchWithTimeout(slow, 100*time.Millisecond)
+  	if !errors.Is(err, ErrTimeout) || got != "" {
+  		t.Fatalf("медленный fetch: получили %q, %v; ожидали \"\", ErrTimeout", got, err)
+  	}
+  	if time.Since(start) > 500*time.Millisecond {
+  		t.Fatal("функция не вернулась по таймауту, а ждала fetch")
+  	}
+  }
+solution: |
+  package main
+
+  import (
+  	"errors"
+  	"time"
+  )
+
+  var ErrTimeout = errors.New("timeout")
+
+  func FetchWithTimeout(fetch func() string, timeout time.Duration) (string, error) {
+  	ch := make(chan string, 1)
+  	go func() { ch <- fetch() }()
+  	select {
+  	case v := <-ch:
+  		return v, nil
+  	case <-time.After(timeout):
+  		return "", ErrTimeout
+  	}
+  }
+
+  func main() {}

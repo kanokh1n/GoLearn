@@ -1,0 +1,178 @@
+title: "Проект: REST API задач"
+type: go
+xp: 50
+theory: |
+  Соберём всё вместе: маленький REST API для списка задач с хранением в памяти.
+
+  | Метод и путь | Что делает | Ответ |
+  |--------------|------------|-------|
+  | `POST /tasks` | создать задачу из `{"title": "..."}` | **201** и созданная задача |
+  | `GET /tasks` | список всех задач | **200** и JSON-массив |
+  | `GET /tasks/{id}` | одна задача | **200** или **404** |
+
+  Задача в JSON: `{"id": 1, "title": "Buy milk", "done": false}`. ID выдаются по порядку с 1.
+
+  Хранилище будет вызываться из разных запросов одновременно, поэтому защити его `sync.Mutex`. ID из пути переводится в число через `strconv.Atoi`.
+task: |
+  Допиши `newServer() http.Handler`, чтобы API работал по таблице выше. Дополнительно:
+
+  - пустой `title` или некорректный JSON при создании → **400**;
+  - `GET /tasks`, когда задач нет, возвращает пустой массив `[]`, а не `null`;
+  - нечисловой или несуществующий id → **404**.
+hint: |
+  Храни задачи в `[]Task` (или `map[int]Task`) внутри структуры с `mu sync.Mutex` и счётчиком `nextID`. Для пустого списка инициализируй слайс: `tasks := []Task{}`. Ответ 201: `w.WriteHeader(http.StatusCreated)` после установки заголовка и до `Encode`.
+starter: |
+  package main
+
+  import (
+  	"net/http"
+  )
+
+  type Task struct {
+  	ID    int    `json:"id"`
+  	Title string `json:"title"`
+  	Done  bool   `json:"done"`
+  }
+
+  func newServer() http.Handler {
+  	mux := http.NewServeMux()
+  	// твои маршруты
+  	return mux
+  }
+
+  func main() {
+  	// http.ListenAndServe(":8080", newServer())
+  }
+tests: |
+  package main
+
+  import (
+  	"encoding/json"
+  	"net/http"
+  	"net/http/httptest"
+  	"strings"
+  	"testing"
+  )
+
+  func do(h http.Handler, method, path, body string) *httptest.ResponseRecorder {
+  	rec := httptest.NewRecorder()
+  	h.ServeHTTP(rec, httptest.NewRequest(method, path, strings.NewReader(body)))
+  	return rec
+  }
+
+  func TestTasksAPI(t *testing.T) {
+  	h := newServer()
+
+  	rec := do(h, "GET", "/tasks", "")
+  	if rec.Code != 200 || strings.TrimSpace(rec.Body.String()) != "[]" {
+  		t.Fatalf("GET /tasks без задач: %d %q, ожидали 200 []", rec.Code, rec.Body.String())
+  	}
+
+  	rec = do(h, "POST", "/tasks", `{"title": "Learn Go"}`)
+  	if rec.Code != 201 {
+  		t.Fatalf("POST /tasks: статус %d, ожидали 201 (тело %q)", rec.Code, rec.Body.String())
+  	}
+  	var created Task
+  	if err := json.Unmarshal(rec.Body.Bytes(), &created); err != nil || created.ID != 1 || created.Title != "Learn Go" || created.Done {
+  		t.Fatalf("POST /tasks вернул %q, ожидали {\"id\":1,\"title\":\"Learn Go\",\"done\":false}", rec.Body.String())
+  	}
+  	do(h, "POST", "/tasks", `{"title": "Write tests"}`)
+
+  	for _, bad := range []string{`{"title": ""}`, `{"title": `} {
+  		if rec := do(h, "POST", "/tasks", bad); rec.Code != 400 {
+  			t.Errorf("POST /tasks %s: статус %d, ожидали 400", bad, rec.Code)
+  		}
+  	}
+
+  	rec = do(h, "GET", "/tasks", "")
+  	var list []Task
+  	if err := json.Unmarshal(rec.Body.Bytes(), &list); err != nil || len(list) != 2 || list[1].ID != 2 || list[1].Title != "Write tests" {
+  		t.Fatalf("GET /tasks = %q, ожидали две задачи с id 1 и 2", rec.Body.String())
+  	}
+
+  	rec = do(h, "GET", "/tasks/2", "")
+  	var one Task
+  	if rec.Code != 200 || json.Unmarshal(rec.Body.Bytes(), &one) != nil || one.Title != "Write tests" {
+  		t.Fatalf("GET /tasks/2: %d %q", rec.Code, rec.Body.String())
+  	}
+  	for _, path := range []string{"/tasks/99", "/tasks/abc"} {
+  		if rec := do(h, "GET", path, ""); rec.Code != 404 {
+  			t.Errorf("GET %s: статус %d, ожидали 404", path, rec.Code)
+  		}
+  	}
+  }
+solution: |
+  package main
+
+  import (
+  	"encoding/json"
+  	"net/http"
+  	"strconv"
+  	"sync"
+  )
+
+  type Task struct {
+  	ID    int    `json:"id"`
+  	Title string `json:"title"`
+  	Done  bool   `json:"done"`
+  }
+
+  type store struct {
+  	mu     sync.Mutex
+  	tasks  []Task
+  	nextID int
+  }
+
+  func writeJSON(w http.ResponseWriter, status int, v any) {
+  	w.Header().Set("Content-Type", "application/json")
+  	w.WriteHeader(status)
+  	json.NewEncoder(w).Encode(v)
+  }
+
+  func newServer() http.Handler {
+  	s := &store{tasks: []Task{}, nextID: 1}
+  	mux := http.NewServeMux()
+
+  	mux.HandleFunc("POST /tasks", func(w http.ResponseWriter, r *http.Request) {
+  		var req struct {
+  			Title string `json:"title"`
+  		}
+  		if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Title == "" {
+  			http.Error(w, "title is required", http.StatusBadRequest)
+  			return
+  		}
+  		s.mu.Lock()
+  		t := Task{ID: s.nextID, Title: req.Title}
+  		s.nextID++
+  		s.tasks = append(s.tasks, t)
+  		s.mu.Unlock()
+  		writeJSON(w, http.StatusCreated, t)
+  	})
+
+  	mux.HandleFunc("GET /tasks", func(w http.ResponseWriter, r *http.Request) {
+  		s.mu.Lock()
+  		list := append([]Task{}, s.tasks...)
+  		s.mu.Unlock()
+  		writeJSON(w, http.StatusOK, list)
+  	})
+
+  	mux.HandleFunc("GET /tasks/{id}", func(w http.ResponseWriter, r *http.Request) {
+  		id, err := strconv.Atoi(r.PathValue("id"))
+  		if err != nil {
+  			http.NotFound(w, r)
+  			return
+  		}
+  		s.mu.Lock()
+  		defer s.mu.Unlock()
+  		for _, t := range s.tasks {
+  			if t.ID == id {
+  				writeJSON(w, http.StatusOK, t)
+  				return
+  			}
+  		}
+  		http.NotFound(w, r)
+  	})
+  	return mux
+  }
+
+  func main() {}

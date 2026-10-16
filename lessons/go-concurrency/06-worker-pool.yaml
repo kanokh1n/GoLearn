@@ -1,0 +1,114 @@
+title: Worker pool
+type: go
+xp: 30
+theory: |
+  Запускать горутину на каждую задачу не всегда можно: если задач миллион, а каждая ходит в базу, база не выдержит. Поэтому используют **пул воркеров**: фиксированное число горутин разбирают задачи из общего канала.
+
+  ```go
+  jobs := make(chan int)
+  var wg sync.WaitGroup
+  for w := 0; w < workers; w++ {
+  	wg.Add(1)
+  	go func() {
+  		defer wg.Done()
+  		for j := range jobs { // каждый воркер берёт следующую задачу
+  			process(j)
+  		}
+  	}()
+  }
+  for _, j := range allJobs {
+  	jobs <- j
+  }
+  close(jobs) // воркеры выйдут из range
+  wg.Wait()
+  ```
+task: |
+  Напиши `Process(jobs []int, workers int, fn func(int) int) []int`:
+
+  - обработай каждое число функцией `fn`, используя **ровно `workers` горутин** (одновременно должно выполняться не больше `workers` вызовов `fn`);
+  - верни результаты **в том же порядке**, что и `jobs`.
+
+  Тест проверяет и порядок, и что задачи действительно идут параллельно, и что воркеров не больше заданного.
+hint: |
+  Отправляй в канал индекс задачи, а не само число: воркер посчитает `results[i] = fn(jobs[i])`. Писать в разные элементы слайса из разных горутин безопасно.
+starter: |
+  package main
+
+  import "fmt"
+
+  func Process(jobs []int, workers int, fn func(int) int) []int {
+  	// твой код здесь
+  	return nil
+  }
+
+  func main() {
+  	double := func(x int) int { return x * 2 }
+  	fmt.Println(Process([]int{1, 2, 3, 4, 5}, 2, double))
+  }
+tests: |
+  package main
+
+  import (
+  	"slices"
+  	"sync/atomic"
+  	"testing"
+  	"time"
+  )
+
+  func TestProcess(t *testing.T) {
+  	var running, maxRunning atomic.Int32
+  	fn := func(x int) int {
+  		n := running.Add(1)
+  		for {
+  			m := maxRunning.Load()
+  			if n <= m || maxRunning.CompareAndSwap(m, n) {
+  				break
+  			}
+  		}
+  		time.Sleep(50 * time.Millisecond)
+  		running.Add(-1)
+  		return x * x
+  	}
+  	jobs := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+  	start := time.Now()
+  	got := Process(jobs, 4, fn)
+  	elapsed := time.Since(start)
+
+  	want := []int{1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144}
+  	if !slices.Equal(got, want) {
+  		t.Fatalf("Process = %v, ожидали %v", got, want)
+  	}
+  	if m := maxRunning.Load(); m > 4 {
+  		t.Fatalf("одновременно выполнялось %d задач, а воркеров 4", m)
+  	}
+  	if elapsed > 400*time.Millisecond {
+  		t.Fatalf("заняло %v — похоже, задачи идут не параллельно", elapsed)
+  	}
+  }
+solution: |
+  package main
+
+  import "sync"
+
+  func Process(jobs []int, workers int, fn func(int) int) []int {
+  	results := make([]int, len(jobs))
+  	idx := make(chan int)
+  	var wg sync.WaitGroup
+  	for w := 0; w < workers; w++ {
+  		wg.Add(1)
+  		go func() {
+  			defer wg.Done()
+  			for i := range idx {
+  				results[i] = fn(jobs[i])
+  			}
+  		}()
+  	}
+  	for i := range jobs {
+  		idx <- i
+  	}
+  	close(idx)
+  	wg.Wait()
+  	return results
+  }
+
+  func main() {}

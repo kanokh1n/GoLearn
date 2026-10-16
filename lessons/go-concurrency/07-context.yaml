@@ -1,0 +1,105 @@
+title: context и отмена
+type: go
+xp: 30
+theory: |
+  **`context.Context`** передаёт по цепочке вызовов сигнал отмены и дедлайн. В бэкенде он везде: HTTP-запрос отменился (клиент ушёл) — значит, надо прекратить и запрос в базу.
+
+  ```go
+  ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+  defer cancel()
+
+  select {
+  case <-ctx.Done():          // канал закрывается при отмене или таймауте
+  	return ctx.Err()        // context.Canceled или context.DeadlineExceeded
+  default:                    // не отменён — продолжаем
+  }
+  ```
+
+  Правила: `ctx` — первый параметр функции, и его не хранят в структурах.
+task: |
+  Напиши `Work(ctx context.Context, steps int, step func()) (int, error)`:
+
+  - вызывай `step()` до `steps` раз;
+  - **перед каждым** вызовом проверяй, не отменён ли контекст. Если отменён, сразу верни, сколько шагов уже выполнено, и `ctx.Err()`;
+  - если все шаги выполнены, верни `steps, nil`.
+hint: |
+  В цикле `for i := 0; i < steps; i++` сначала `if err := ctx.Err(); err != nil { return i, err }`, потом `step()`.
+starter: |
+  package main
+
+  import (
+  	"context"
+  	"fmt"
+  	"time"
+  )
+
+  func Work(ctx context.Context, steps int, step func()) (int, error) {
+  	// твой код здесь
+  	return 0, nil
+  }
+
+  func main() {
+  	ctx, cancel := context.WithTimeout(context.Background(), 250*time.Millisecond)
+  	defer cancel()
+  	n, err := Work(ctx, 10, func() { time.Sleep(100 * time.Millisecond) })
+  	fmt.Println(n, err)
+  }
+tests: |
+  package main
+
+  import (
+  	"context"
+  	"errors"
+  	"testing"
+  )
+
+  func TestWorkAllSteps(t *testing.T) {
+  	calls := 0
+  	n, err := Work(context.Background(), 5, func() { calls++ })
+  	if n != 5 || err != nil || calls != 5 {
+  		t.Fatalf("Work(5 шагов) = %d, %v (вызовов %d); ожидали 5, nil", n, err, calls)
+  	}
+  }
+
+  func TestWorkCancel(t *testing.T) {
+  	ctx, cancel := context.WithCancel(context.Background())
+  	calls := 0
+  	step := func() {
+  		calls++
+  		if calls == 3 {
+  			cancel() // клиент «ушёл» после третьего шага
+  		}
+  	}
+  	n, err := Work(ctx, 10, step)
+  	if !errors.Is(err, context.Canceled) {
+  		t.Fatalf("ошибка = %v, ожидали context.Canceled", err)
+  	}
+  	if n != 3 || calls != 3 {
+  		t.Fatalf("выполнено %d шагов (вызовов %d), ожидали остановку после 3", n, calls)
+  	}
+  }
+
+  func TestWorkAlreadyCancelled(t *testing.T) {
+  	ctx, cancel := context.WithCancel(context.Background())
+  	cancel()
+  	n, err := Work(ctx, 10, func() { t.Fatal("step не должен вызываться после отмены") })
+  	if n != 0 || !errors.Is(err, context.Canceled) {
+  		t.Fatalf("Work(отменённый ctx) = %d, %v; ожидали 0, context.Canceled", n, err)
+  	}
+  }
+solution: |
+  package main
+
+  import "context"
+
+  func Work(ctx context.Context, steps int, step func()) (int, error) {
+  	for i := 0; i < steps; i++ {
+  		if err := ctx.Err(); err != nil {
+  			return i, err
+  		}
+  		step()
+  	}
+  	return steps, nil
+  }
+
+  func main() {}

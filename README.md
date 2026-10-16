@@ -8,6 +8,8 @@ built-in editor, press **Check**, and get the result right away.
 Tracks right now:
 
 - **Go Basics (Основы Go)**: 10 lessons, from Hello World to errors. Code runs with `go run` / `go test`.
+- **Go: конкурентность**: 7 lessons: goroutines, `WaitGroup`, channels, pipelines, `select`, `Mutex`, worker pool, `context`.
+- **Go: HTTP и API**: 8 lessons: handlers, query params, JSON in and out, `ServeMux` routing, middleware, HTTP client, a small REST API.
 - **SQL Basics (Основы SQL)**: 12 lessons, from `SELECT` to `JOIN` and subqueries. Queries run in SQLite and are compared with a reference query.
 
 - **Linux и терминал**: 8 lessons: files, `find`, `grep`, pipes, permissions, bash scripts.
@@ -88,7 +90,7 @@ Tables come from `setup` in `track.yaml` (or in the lesson itself).
 ## Roadmap
 
 - Docker lessons in the terminal
-- More tracks: concurrency, HTTP APIs, Docker, Kubernetes, AWS
+- More tracks: Docker, Kubernetes, AWS
 - Quizzes for theory topics
 
 ## Third-party code

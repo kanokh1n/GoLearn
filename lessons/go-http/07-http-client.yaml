@@ -1,0 +1,105 @@
+title: HTTP-клиент
+type: go
+xp: 25
+theory: |
+  Бэкенд часто сам ходит в другие сервисы. Для этого есть `http.Client`. Главное правило: **всегда задавай таймаут**, у `http.Get` по умолчанию его нет.
+
+  ```go
+  client := &http.Client{Timeout: 5 * time.Second}
+  resp, err := client.Get(url)
+  if err != nil {
+  	return err
+  }
+  defer resp.Body.Close()          // обязательно закрыть тело
+
+  if resp.StatusCode != http.StatusOK {
+  	return fmt.Errorf("unexpected status %d", resp.StatusCode)
+  }
+  var data Payload
+  err = json.NewDecoder(resp.Body).Decode(&data)
+  ```
+task: |
+  Напиши `FetchTitle(url string) (string, error)`:
+
+  - сделай GET-запрос на `url` (с таймаутом);
+  - сервис отвечает JSON вида `{"title": "...", "id": 7}` — верни `title`;
+  - если статус не 200 — верни ошибку.
+
+  Тест поднимает настоящий тестовый сервер через `httptest.NewServer`.
+hint: |
+  `client := &http.Client{Timeout: 5 * time.Second}`, `resp, err := client.Get(url)`, `defer resp.Body.Close()`, проверка `resp.StatusCode`, затем декодирование в `struct{ Title string `json:"title"` }`.
+starter: |
+  package main
+
+  import (
+  	"fmt"
+  )
+
+  func FetchTitle(url string) (string, error) {
+  	// твой код здесь
+  	return "", nil
+  }
+
+  func main() {
+  	fmt.Println("FetchTitle проверяется тестами")
+  }
+tests: |
+  package main
+
+  import (
+  	"fmt"
+  	"net/http"
+  	"net/http/httptest"
+  	"testing"
+  )
+
+  func TestFetchTitle(t *testing.T) {
+  	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+  		switch r.URL.Path {
+  		case "/ok":
+  			w.Header().Set("Content-Type", "application/json")
+  			fmt.Fprint(w, `{"id": 7, "title": "Learn Go HTTP"}`)
+  		default:
+  			http.Error(w, "boom", http.StatusInternalServerError)
+  		}
+  	}))
+  	defer srv.Close()
+
+  	title, err := FetchTitle(srv.URL + "/ok")
+  	if err != nil || title != "Learn Go HTTP" {
+  		t.Fatalf("FetchTitle(/ok) = %q, %v; ожидали \"Learn Go HTTP\", nil", title, err)
+  	}
+  	if _, err := FetchTitle(srv.URL + "/fail"); err == nil {
+  		t.Fatal("FetchTitle(/fail) со статусом 500 должна вернуть ошибку")
+  	}
+  }
+solution: |
+  package main
+
+  import (
+  	"encoding/json"
+  	"fmt"
+  	"net/http"
+  	"time"
+  )
+
+  func FetchTitle(url string) (string, error) {
+  	client := &http.Client{Timeout: 5 * time.Second}
+  	resp, err := client.Get(url)
+  	if err != nil {
+  		return "", err
+  	}
+  	defer resp.Body.Close()
+  	if resp.StatusCode != http.StatusOK {
+  		return "", fmt.Errorf("unexpected status %d", resp.StatusCode)
+  	}
+  	var data struct {
+  		Title string `json:"title"`
+  	}
+  	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
+  		return "", err
+  	}
+  	return data.Title, nil
+  }
+
+  func main() {}

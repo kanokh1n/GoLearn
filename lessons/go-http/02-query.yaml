@@ -1,0 +1,85 @@
+title: Параметры и статус-коды
+type: go
+xp: 20
+theory: |
+  Параметры строки запроса (`/greet?name=Anna`) читаются через `r.URL.Query()`:
+
+  ```go
+  name := r.URL.Query().Get("name") // "" если параметра нет
+  ```
+
+  Код ответа задаёт `w.WriteHeader(code)` — **до** записи тела. Для ошибок есть короткий вариант:
+
+  ```go
+  http.Error(w, "name is required", http.StatusBadRequest) // 400
+  return // не забудь выйти из хендлера!
+  ```
+
+  Частые коды: `200 OK`, `201 Created`, `400 Bad Request`, `401 Unauthorized`, `404 Not Found`, `405 Method Not Allowed`, `500 Internal Server Error`.
+task: |
+  Напиши `greetHandler`:
+
+  - `GET /greet?name=Anna` → статус 200, тело `Hello, Anna!`;
+  - если параметра `name` нет или он пустой → статус **400** и текст `name is required`.
+hint: |
+  `if name == "" { http.Error(w, "name is required", http.StatusBadRequest); return }`, затем `fmt.Fprintf(w, "Hello, %s!", name)`.
+starter: |
+  package main
+
+  import (
+  	"net/http"
+  )
+
+  func greetHandler(w http.ResponseWriter, r *http.Request) {
+  	// твой код здесь
+  }
+
+  func main() {}
+tests: |
+  package main
+
+  import (
+  	"net/http"
+  	"net/http/httptest"
+  	"strings"
+  	"testing"
+  )
+
+  func TestGreet(t *testing.T) {
+  	cases := []struct {
+  		url      string
+  		wantCode int
+  		wantBody string
+  	}{
+  		{"/greet?name=Anna", 200, "Hello, Anna!"},
+  		{"/greet?name=Go", 200, "Hello, Go!"},
+  		{"/greet", 400, "name is required"},
+  		{"/greet?name=", 400, "name is required"},
+  	}
+  	for _, c := range cases {
+  		rec := httptest.NewRecorder()
+  		greetHandler(rec, httptest.NewRequest(http.MethodGet, c.url, nil))
+  		body := strings.TrimSpace(rec.Body.String())
+  		if rec.Code != c.wantCode || body != c.wantBody {
+  			t.Errorf("GET %s → %d %q, ожидали %d %q", c.url, rec.Code, body, c.wantCode, c.wantBody)
+  		}
+  	}
+  }
+solution: |
+  package main
+
+  import (
+  	"fmt"
+  	"net/http"
+  )
+
+  func greetHandler(w http.ResponseWriter, r *http.Request) {
+  	name := r.URL.Query().Get("name")
+  	if name == "" {
+  		http.Error(w, "name is required", http.StatusBadRequest)
+  		return
+  	}
+  	fmt.Fprintf(w, "Hello, %s!", name)
+  }
+
+  func main() {}

@@ -1,0 +1,3 @@
+title: "Go: HTTP и API"
+description: Пишем HTTP-сервер на net/http — хендлеры, JSON, роутинг, middleware и маленький REST API.
+order: 3
